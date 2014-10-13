@@ -8,6 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
@@ -15,6 +19,9 @@ public class MainScreen extends Activity {
 
     private Destination[] destinations;
 
+    private TextView info;
+    private EditText input;
+    private Button goSearch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +55,18 @@ public class MainScreen extends Activity {
             ((TextView)row.findViewById(R.id.column_2)).setText(destinations[i].longitude + ":" + destinations[i].latitude);
             table.addView(row);
         }
+        info = (TextView) findViewById(R.id.searchBarResult);
+        input = (EditText)findViewById(R.id.searchBar);
+        goSearch = (Button) findViewById(R.id.searchButton);
+        goSearch.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String inputText = input.getText().toString();
+                info.setText(inputText);
+            }
+
+    });
     }
 
 
@@ -69,4 +88,7 @@ public class MainScreen extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-}
+
+
+    }
+

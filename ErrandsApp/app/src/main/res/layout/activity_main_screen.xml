@@ -13,6 +13,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
+    <TextView
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView" />
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchBar"
+        android:hint="Test Search Bar"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="33dp"
+        android:actionViewClass="android.widget.SearchView"
+        android:imeOptions="actionNext"
+        android:layout_alignRight="@+id/searchBarResult" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/searchBarResult"
+        android:layout_below="@+id/searchBar"
+        android:layout_centerHorizontal="true" />
+
+
+    <Button
+        android:id="@+id/searchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignTop="@+id/searchBar"
+        android:layout_toRightOf="@+id/searchBar"
+        android:layout_marginLeft="32dp"
+        android:layout_above="@+id/searchBarResult" />
+
+
     </TableLayout>
 </RelativeLayout>
 
