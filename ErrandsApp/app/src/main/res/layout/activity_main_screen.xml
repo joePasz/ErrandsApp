@@ -19,6 +19,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView" />
 
+
+    </TableLayout>
+
     <EditText
         android:layout_width="150dp"
         android:layout_height="wrap_content"
@@ -51,8 +54,6 @@
         android:layout_marginLeft="32dp"
         android:layout_above="@+id/searchBarResult" />
 
-
-    </TableLayout>
 </RelativeLayout>
 
 

@@ -69,9 +69,12 @@
       <file leaf-file-name="activity_main_screen.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ErrandsApp/app/src/main/res/layout/activity_main_screen.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37593985" vertical-offset="0" max-vertical-offset="960">
-              <caret line="10" column="16" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.2631579" vertical-offset="0" max-vertical-offset="975">
+              <caret line="7" column="30" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
               <folding>
+                <element signature="e#231#266#0" expanded="true" />
+                <element signature="e#292#327#0" expanded="true" />
+                <element signature="e#351#384#0" expanded="true" />
                 <element signature="e#655#676#0" expanded="true" />
               </folding>
             </state>
@@ -438,6 +441,9 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="196" max-vertical-offset="840">
           <caret line="38" column="31" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
           <folding>
+            <element signature="e#231#266#0" expanded="true" />
+            <element signature="e#292#327#0" expanded="true" />
+            <element signature="e#351#384#0" expanded="true" />
             <element signature="e#655#676#0" expanded="true" />
           </folding>
         </state>
@@ -466,9 +472,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ErrandsApp/app/src/main/res/layout/activity_main_screen.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37593985" vertical-offset="0" max-vertical-offset="960">
-          <caret line="10" column="16" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.2631579" vertical-offset="0" max-vertical-offset="975">
+          <caret line="7" column="30" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
           <folding>
+            <element signature="e#231#266#0" expanded="true" />
+            <element signature="e#292#327#0" expanded="true" />
+            <element signature="e#351#384#0" expanded="true" />
             <element signature="e#655#676#0" expanded="true" />
           </folding>
         </state>
