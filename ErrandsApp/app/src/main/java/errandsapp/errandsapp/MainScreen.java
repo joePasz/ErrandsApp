@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,9 +28,12 @@ public class MainScreen extends Activity {
     private TableLayout table;
     LayoutInflater inflater;
 
+    private final String TAG = ((Object) this).getClass().getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_main_screen);
 
         inflater = (LayoutInflater)this.getSystemService
@@ -92,6 +96,37 @@ public class MainScreen extends Activity {
         getMenuInflater().inflate(R.menu.main_screen, menu);
         return true;
     }
+
+    protected void onResume() {
+        super.onResume();
+        Log.e(TAG, "++ In onResume() ++");
+    }
+    protected void onStart() {
+        super.onStart();
+        Log.e(TAG, "++ In onStart() ++");
+
+    }
+    protected void onRestart() {
+        super.onRestart();
+        Log.e(TAG, "++ In onRestart() ++");
+
+    }
+    protected void onPause() {
+        super.onPause();
+        Log.e(TAG, "++ In onPause() ++");
+
+    }
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "++ In onStop() ++");
+
+    }
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "++ In onDestroy() ++");
+
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

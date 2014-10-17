@@ -3,6 +3,7 @@ package errandsapp.errandsapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +22,12 @@ public class Search extends Activity {
     private EditText input;
     private Button goSearch;
 
+    private final String TAG = ((Object) this).getClass().getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_search);
 
         Intent intent = getIntent();
@@ -45,6 +49,36 @@ public class Search extends Activity {
             }
 
         });
+    }
+
+    protected void onResume() {
+        super.onResume();
+        Log.e(TAG, "++ In onResume() ++");
+    }
+    protected void onStart() {
+        super.onStart();
+        Log.e(TAG, "++ In onStart() ++");
+
+    }
+    protected void onRestart() {
+        super.onRestart();
+        Log.e(TAG, "++ In onRestart() ++");
+
+    }
+    protected void onPause() {
+        super.onPause();
+        Log.e(TAG, "++ In onPause() ++");
+
+    }
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "++ In onStop() ++");
+
+    }
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e(TAG, "++ In onDestroy() ++");
+
     }
 
 
