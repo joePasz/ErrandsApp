@@ -9,8 +9,19 @@
     tools:context="errandsapp.errandsapp.BuildRoute">
 
     <TextView
-        android:text="@string/hello_world"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Url"
+        android:id="@+id/Url"
+        android:layout_below="@+id/searchBar"
+        android:layout_centerHorizontal="true" />
+
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </TableLayout>
+
 
 </RelativeLayout>
