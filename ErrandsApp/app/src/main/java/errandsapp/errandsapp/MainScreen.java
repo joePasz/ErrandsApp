@@ -150,7 +150,9 @@ public class MainScreen extends Activity {
             case (0) : {
                 if (resultCode == Activity.RESULT_OK) {
                     String newText = data.getStringExtra("dName");
-                    Destination dest = new Destination(newText,0,0);
+                    double newLong = data.getDoubleExtra("dLong",0.0);
+                    double newLat = data.getDoubleExtra("dLat",0.0);
+                    Destination dest = new Destination(newText,newLong,newLat);
                     destinations.add(dest);
                     //rebuild table
                     buildTable();

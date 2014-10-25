@@ -40,4 +40,12 @@
     android:layout_marginLeft="32dp"
     android:layout_above="@+id/searchBarResult" />
 
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/searchBarResult">
+
+    </TableLayout>
+
 </RelativeLayout>
