@@ -36,6 +36,7 @@ public class Search extends Activity {
 
         Intent intent = getIntent();
 
+
         info = (TextView) findViewById(R.id.searchBarResult);
         input = (EditText)findViewById(R.id.searchBar);
         goSearch = (Button) findViewById(R.id.searchButton);

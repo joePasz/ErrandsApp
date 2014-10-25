@@ -25,6 +25,7 @@ public class MainScreen extends Activity {
 //    private Destination[] destinations;
     private ArrayList<Destination> destinations;
     private Button searchButton;
+    private Button buildRouteButton;
     private TableLayout table;
     LayoutInflater inflater;
 
@@ -61,6 +62,44 @@ public class MainScreen extends Activity {
             }
 
         });
+
+        buildRouteButton = (Button) findViewById(R.id.buildRouteButton);
+        buildRouteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), BuildRoute.class);
+                String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+                Integer lastIndex = destinations.size() - 1;
+                String originName;
+                String deName;
+
+                originName = destinations.get(0).longitude + "," + destinations.get(0).latitude;
+                deName = destinations.get(lastIndex).longitude + "," + destinations.get(lastIndex).latitude;
+
+                urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
+
+                for(int i=0; i<lastIndex; i++){
+                    String locString;
+                    locString = destinations.get(i).longitude + "," + destinations.get(i).latitude;
+
+                    if(i == (lastIndex-1)){
+                    urlString = urlString + locString;
+                    }
+                    else{
+                        urlString = urlString + locString + "|";
+                    }
+                }
+
+                urlString = urlString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+
+                intent.putExtra("dString", urlString);
+
+                startActivityForResult(intent, 1);
+            }
+
+        });
+
+
     }
 
     //This first removes all views within the table if there are any, then builds
