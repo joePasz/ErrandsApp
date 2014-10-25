@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 
 public class Search extends Activity {
@@ -42,10 +46,20 @@ public class Search extends Activity {
                 String inputText = input.getText().toString();
                 info.setText(inputText);
 
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("dName", inputText);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                //Intent resultIntent = new Intent();
+                //resultIntent.putExtra("dName", inputText);
+                //setResult(Activity.RESULT_OK, resultIntent);
+                new Thread(new Runnable(){
+
+                    public void run(){
+                        String testURLString = "https://maps.googleapis.com/maps/api/place/textsearch/xml?query=restaurants+in+Sydney&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+                        String content = getUrlContents(testURLString);
+                    }
+                }).start();
+
+
+
+                //finish();
             }
 
         });
@@ -100,4 +114,22 @@ public class Search extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private String getUrlContents(String theUrl) {
+        StringBuilder content = new StringBuilder();
+        try {
+            URL url = new URL(theUrl);
+            URLConnection urlConnection = url.openConnection();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line + "\n");
+            }
+            bufferedReader.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return content.toString();
+    }
+
 }

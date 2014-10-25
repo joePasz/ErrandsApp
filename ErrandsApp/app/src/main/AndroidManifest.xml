@@ -4,10 +4,10 @@
 
     <application
         android:allowBackup="true"
+        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:debuggable="true" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainScreen"
             android:label="@string/app_name" >
@@ -22,6 +22,16 @@
             android:label="@string/title_activity_search"
             android:parentActivityName=".MainScreen" >
         </activity>
+        <activity
+            android:name=".BuildRoute"
+            android:label="@string/title_activity_build_route"
+            android:parentActivityName=".MainScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="errandsapp.errandsapp.MainScreen" />
+        </activity>
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
