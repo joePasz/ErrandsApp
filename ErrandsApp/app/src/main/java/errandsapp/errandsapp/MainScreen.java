@@ -41,11 +41,11 @@ public class MainScreen extends Activity {
                 (Context.LAYOUT_INFLATER_SERVICE);
 
         //Just an ugly, quick, and dirty way to build an array of these destination object
-        Destination dest = new Destination("Starbucks",32.04947,-40.2381);
+//        Destination dest = new Destination("Starbucks",32.04947,-40.2381);
         destinations = new ArrayList<Destination>();
-        for(int i = 0; i < 5; i++){
-            destinations.add(dest);
-        }
+//        for(int i = 0; i < 5; i++){
+//            destinations.add(dest);
+//        }
 
         //build main table
         table = (TableLayout)findViewById(R.id.table);
@@ -108,6 +108,7 @@ public class MainScreen extends Activity {
         int count = table.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = table.getChildAt(i);
+
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
         }
 

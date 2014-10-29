@@ -111,9 +111,9 @@ public class Search extends Activity {
 
                     }
 
-                    protected void onPostExecute() {
-                        buildTable();
-                    }
+//                    protected void onPostExecute() {
+//                        buildTable();
+//                    }
                 }).start();
 
 
