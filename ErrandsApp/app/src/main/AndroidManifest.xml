@@ -39,6 +39,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="errandsapp.errandsapp.MainScreen" />
         </activity>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"	android:value="AIzaSyDfKtM-4A3xVX8Ge3kwZZhKEzi8JlTLAAw"/>
     </application>
 
 </manifest>
