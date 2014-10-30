@@ -112,11 +112,6 @@ public class MainScreen extends Activity {
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
         }
 
-        //builds a header row, ugly, but proof of concept
-        TableRow header = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
-        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
-        ((TextView)header.findViewById(R.id.column_2)).setText("Long:Lat");
-        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file

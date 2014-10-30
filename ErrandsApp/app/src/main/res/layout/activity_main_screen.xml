@@ -28,11 +28,38 @@
             android:text="Search"
             android:layout_gravity="center_horizontal"/>
 
+        <LinearLayout
+            android:id="@+id/Table_Header"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/table"
+            android:layout_alignParentStart="true"
+            android:paddingTop="7dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp">
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="Destinations"
+                android:paddingTop="5dp"
+                android:textStyle="bold"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Long:Lat"
+                android:id="@+id/LongLat"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:paddingTop="5dp"/>
+        </LinearLayout>
+
 
     </TableLayout>
-
-
-
 
 
 </RelativeLayout>

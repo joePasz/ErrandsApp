@@ -2,11 +2,12 @@
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android">
 <TextView
     android:id="@+id/column_1"
-    android:textStyle="bold"/>
+    android:textStyle="bold"
+    android:layout_weight="1"/>
 <TextView
     android:id="@+id/column_2"
     android:gravity="end"
     android:textStyle="normal"
-    android:layout_weight="1.0"/>
+    android:layout_weight="1"/>
 
 </TableRow>
