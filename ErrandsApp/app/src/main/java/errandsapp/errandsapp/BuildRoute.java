@@ -101,9 +101,11 @@ public class BuildRoute extends Activity {
         originName = destinations.get(0).longitude + "," + destinations.get(0).latitude;
         deName = destinations.get(lastIndex).longitude + "," + destinations.get(lastIndex).latitude;
 
-        urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
 
         for(int i=1; i<lastIndex; i++){
+            if(i==1){
+                urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
+            }
             String locString;
             locString = destinations.get(i).longitude + "," + destinations.get(i).latitude;
 
@@ -145,7 +147,7 @@ public class BuildRoute extends Activity {
 //                    }
                     Message msg = Message.obtain();
                     msg.what = 0;
-                    handler.sendMessage(msg);
+                    //handler.sendMessage(msg);
 
                 }
 
