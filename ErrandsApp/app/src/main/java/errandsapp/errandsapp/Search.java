@@ -83,8 +83,7 @@ public class Search extends Activity implements LocationListener{
             }
         }
         destinations = new ArrayList<Destination>();
-        inflater = (LayoutInflater)this.getSystemService
-                (Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         Intent intent = getIntent();
 
@@ -136,7 +135,6 @@ public class Search extends Activity implements LocationListener{
 //                        buildTable();
 //                    }
                 }).start();
-
 
 
                 //finish();

@@ -33,12 +33,14 @@ import java.util.ArrayList;
 public class BuildRoute extends Activity {
 
     private ArrayList<Destination> destinations;
+    private ArrayList<Destination> orderedDestinations;
     private TableLayout table;
     LayoutInflater inflater;
 
     private ArrayList<String> listOfDestNames;
     private double[] listOfDestLong;
     private double[] listOfDestLat;
+
 
     private String displayUrl;
     private TextView textView;
@@ -67,6 +69,7 @@ public class BuildRoute extends Activity {
 
         listOfDestNames = new ArrayList<String>();
         destinations = new ArrayList<Destination>();
+        orderedDestinations = new ArrayList<Destination>();
 
         textView = (TextView)findViewById(R.id.Url);
 
@@ -131,20 +134,43 @@ public class BuildRoute extends Activity {
 
                     //This is the parsing code for Search, not Build Route, This will cause it to crash
                     //We need to fix this parser for build route
-//                    try {
-//                        JSONObject searchResultJSON = new JSONObject(searchResultString);
-//                        JSONArray resultsJSONArray = searchResultJSON.getJSONArray("results");
-//                        destinations.clear();
-//                        for(int i = 0; i < resultsJSONArray.length(); i++) {
-//                            JSONObject result = (JSONObject)resultsJSONArray.get(i);
-//                            JSONObject geometry = (JSONObject) result.get("geometry");
-//                            JSONObject location = (JSONObject) geometry.get("location");
-//                            Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lat"),(Double) location.get("lng"));
-//                            destinations.add(tempDest);
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        JSONObject directionsResultJSON = new JSONObject(searchResultString);
+                        JSONArray routesArray = directionsResultJSON.getJSONArray("routes");
+                        JSONObject route = routesArray.getJSONObject(0);
+                        JSONArray legs ;
+                        JSONObject leg ;
+                        JSONArray steps ;
+                        JSONObject dist;
+                        Integer distance ;
+                        if(route.has("legs")) {
+                            legs = route.getJSONArray("legs");
+                            for(int i2 = 0; i2 < legs.length();i2++) {
+                                leg = legs.getJSONObject(i2);
+                                JSONObject location = (JSONObject) leg.get("start_location");
+                                Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+                                orderedDestinations.add(tempDest);
+//                                steps = leg.getJSONArray("steps"); // EDIT : I had somehow missed this line before when copying the code from IDE to the website
+//                                int nsteps = steps.length() ;
+//                                for(int i=0;i<nsteps;i++) {
+//                                    JSONObject step = steps.getJSONObject(i);
+//                                    if(step.has("distance")) {
+//                                        dist = (JSONObject) step.get("distance");// throws exception
+//                                        //I would like to take the distance value and do something with it
+//                                        //if(dist.has("value"))
+//                                        //  distance = (Integer) dist.get("value") ;
+//                                    }
+//                                }
+                            }
+                            leg = legs.getJSONObject(legs.length()-1);
+                            JSONObject location = (JSONObject) leg.get("end_location");
+                            Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+                            orderedDestinations.add(tempDest);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     Message msg = Message.obtain();
                     msg.what = 0;
                     //handler.sendMessage(msg);
