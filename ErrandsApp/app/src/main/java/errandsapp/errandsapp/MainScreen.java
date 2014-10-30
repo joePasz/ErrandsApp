@@ -153,8 +153,8 @@ public class MainScreen extends Activity implements LocationListener {
             // not sure what inflates does, but I think I am doing this right....
             TableRow row = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
             //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.column_1)).setText(destinations.get(i).name);
-            ((TextView)row.findViewById(R.id.column_2)).setText(destinations.get(i).longitude + ":" + destinations.get(i).latitude);
+            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
             table.addView(row);
         }
         return true;

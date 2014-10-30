@@ -1,13 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableRow xmlns:android="http://schemas.android.com/apk/res/android">
-<TextView
-    android:id="@+id/column_1"
-    android:textStyle="bold"
-    android:layout_weight="1"/>
-<TextView
-    android:id="@+id/column_2"
-    android:gravity="end"
-    android:textStyle="normal"
-    android:layout_weight="1"/>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+
+
+    <!--Layout for the Destination and the Address -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+        android:id="@+id/desti"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:padding="5dp"
+        android:text="@string/destination_header"
+        />
+
+        <TextView
+            android:id="@+id/address"
+            android:textStyle="normal"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Address"
+            android:layout_below="@id/desti"
+            android:padding="5dp"
+            />
+    </LinearLayout>
+
+    <!--Layout for the Two Buttons -->
+    <LinearLayout
+       android:layout_height="match_parent"
+       android:layout_width="wrap_content"
+       android:layout_weight="1"
+
+        >
+
+    <Button android:id="@+id/start_button"
+         android:text="@string/start_button"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:textSize="8dp"
+         android:layout_gravity="center"
+         android:background="#00CC00"
+         android:padding="3dp"
+         android:layout_margin="5dp"
+         />
+        <Button android:id="@+id/end_Button"
+        android:text="@string/end_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="8dp"
+        android:layout_gravity="center"
+        android:background="#FF0000"
+        android:padding="3dp"
+        android:layout_margin="5dp"
+        />
+
+
+    </LinearLayout>
 
 </TableRow>
