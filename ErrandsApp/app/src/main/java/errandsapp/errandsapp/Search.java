@@ -2,11 +2,15 @@ package errandsapp.errandsapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,7 +35,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 
-public class Search extends Activity {
+public class Search extends Activity implements LocationListener{
 
 
 
@@ -40,6 +44,8 @@ public class Search extends Activity {
     private Button goSearch;
     private ArrayList<Destination> destinations;
     private TableLayout table;
+    private LocationManager locationManager;
+    private Location currentLocation;
     LayoutInflater inflater;
     private Handler handler = new Handler(){
         @Override
@@ -59,6 +65,17 @@ public class Search extends Activity {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_search);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, this);
+
+        if(locationManager != null) {
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(currentLocation != null) {
+                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
+            }
+        }
+
         destinations = new ArrayList<Destination>();
         inflater = (LayoutInflater)this.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
@@ -77,19 +94,16 @@ public class Search extends Activity {
 
             @Override
             public void onClick(View v) {
-//                String inputText = input.getText().toString();
-//                info.setText(inputText);
-
-                //Intent resultIntent = new Intent();
-                //resultIntent.putExtra("dName", inputText);
-                //setResult(Activity.RESULT_OK, resultIntent);
                 new Thread(new Runnable(){
 
                     public void run(){
                         String inputString = input.getText().toString();
                         inputString = inputString.replace(' ', '+');
-                        String URLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + inputString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
-//                        String testURLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=resturaunts+in+columbus&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+                        String URLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + inputString;
+                        if(currentLocation != null) {
+                            URLString = URLString + "&location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude() + "&radius=5000";
+                        }
+                        URLString = URLString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
                         String searchResultString = getUrlContents(URLString);
                         try {
                             JSONObject searchResultJSON = new JSONObject(searchResultString);
@@ -100,6 +114,7 @@ public class Search extends Activity {
                                 JSONObject geometry = (JSONObject) result.get("geometry");
                                 JSONObject location = (JSONObject) geometry.get("location");
                                 Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lat"),(Double) location.get("lng"));
+                                tempDest.address = result.getString("formatted_address");
                                 destinations.add(tempDest);
                             }
                         } catch (JSONException e) {
@@ -163,6 +178,7 @@ public class Search extends Activity {
             resultIntent.putExtra("dName", clickedDest.name);
             resultIntent.putExtra("dLong", clickedDest.longitude);
             resultIntent.putExtra("dLat", clickedDest.latitude);
+            resultIntent.putExtra("dAddress", clickedDest.address);
             setResult(Activity.RESULT_OK, resultIntent);
 
             finish();
@@ -236,6 +252,29 @@ public class Search extends Activity {
             e.printStackTrace();
         }
         return content.toString();
+    }
+
+
+    //Following are location methods!!
+    @Override
+    public void onLocationChanged(Location location) {
+
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 
 }

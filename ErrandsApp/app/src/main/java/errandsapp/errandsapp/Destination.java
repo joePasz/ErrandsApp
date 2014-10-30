@@ -8,6 +8,7 @@ public class Destination {
     public String name;
     public double longitude;
     public double latitude;
+    public String address;
 
 
     public Destination(String name, double longitude, double latitude) {

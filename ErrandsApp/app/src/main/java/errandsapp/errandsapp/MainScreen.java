@@ -188,6 +188,7 @@ public class MainScreen extends Activity {
                     double newLong = data.getDoubleExtra("dLong",0.0);
                     double newLat = data.getDoubleExtra("dLat",0.0);
                     Destination dest = new Destination(newText,newLong,newLat);
+                    dest.address = data.getStringExtra("dAddress");
                     destinations.add(dest);
                     //rebuild table
                     buildTable();
