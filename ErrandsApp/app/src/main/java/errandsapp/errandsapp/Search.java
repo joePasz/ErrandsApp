@@ -67,15 +67,21 @@ public class Search extends Activity implements LocationListener{
         setContentView(R.layout.activity_search);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, this);
+        boolean isWifiEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if(locationManager != null) {
+        if(locationManager != null && isGPSEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if(currentLocation != null) {
                 Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
             }
+        } else if(locationManager != null && isWifiEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(currentLocation != null) {
+                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
+            }
         }
-
         destinations = new ArrayList<Destination>();
         inflater = (LayoutInflater)this.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
