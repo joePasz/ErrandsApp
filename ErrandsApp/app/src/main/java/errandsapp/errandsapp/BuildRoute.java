@@ -36,6 +36,10 @@ public class BuildRoute extends Activity {
     private TableLayout table;
     LayoutInflater inflater;
 
+    private ArrayList<String> listOfDestNames;
+    private double[] listOfDestLong;
+    private double[] listOfDestLat;
+
     private String displayUrl;
     private TextView textView;
     private Handler handler = new Handler(){
@@ -57,15 +61,67 @@ public class BuildRoute extends Activity {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_build_route);
+        String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+        String originName;
+        String deName;
+
+        listOfDestNames = new ArrayList<String>();
+        destinations = new ArrayList<Destination>();
 
         textView = (TextView)findViewById(R.id.Url);
 
         Intent intent = getIntent();
-        displayUrl = intent.getStringExtra("dString");
+        listOfDestNames = intent.getStringArrayListExtra("dName");
 
-//        textView.setText(displayUrl);
+        int size = listOfDestNames.size();
+        int lastIndex = size - 1;
+
+
+        listOfDestLong = new double[size];
+        listOfDestLat = new double[size];
+
+        listOfDestLong = intent.getDoubleArrayExtra("dLong");
+        listOfDestLat = intent.getDoubleArrayExtra("dLat");
+
+
+
+        for(int i=0; i <size; i++){
+            String destName;
+            Double destLong;
+            Double destLat;
+            destName = listOfDestNames.get(i);
+            destLong = listOfDestLong[i];
+            destLat = listOfDestLat[i];
+            Destination des = new Destination(destName, destLong, destLat);
+
+            destinations.add(i, des);
+
+        }
+
+        originName = destinations.get(0).longitude + "," + destinations.get(0).latitude;
+        deName = destinations.get(lastIndex).longitude + "," + destinations.get(lastIndex).latitude;
+
+        urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
+
+        for(int i=1; i<lastIndex; i++){
+            String locString;
+            locString = destinations.get(i).longitude + "," + destinations.get(i).latitude;
+
+            if(i == (lastIndex-1)){
+                urlString = urlString + locString;
+            }
+            else{
+                urlString = urlString + locString + "|";
+            }
+        }
+
+        urlString = urlString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+
+        displayUrl = urlString;
+        textView.setText(displayUrl);
+
         Log.e(TAG, displayUrl);
-        if(!displayUrl.isEmpty()) {
+        if(displayUrl != null) {
             new Thread(new Runnable(){
                 public void run(){
                     String URLString = displayUrl;

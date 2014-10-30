@@ -35,6 +35,10 @@ public class MainScreen extends Activity implements LocationListener {
     private Location currentLocation;
     LayoutInflater inflater;
 
+    private ArrayList<String> listOfDestNames;
+    private double[] listOfDestLong;
+    private double[] listOfDestLat;
+
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
     @Override
@@ -105,30 +109,25 @@ public class MainScreen extends Activity implements LocationListener {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), BuildRoute.class);
                 String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-                Integer lastIndex = destinations.size() - 1;
-                String originName;
-                String deName;
+                Integer destSize = destinations.size();
 
-                originName = destinations.get(0).longitude + "," + destinations.get(0).latitude;
-                deName = destinations.get(lastIndex).longitude + "," + destinations.get(lastIndex).latitude;
+                listOfDestLong = new double[destSize];
+                listOfDestLat = new double[destSize];
+                listOfDestNames = new ArrayList<String>();
 
-                urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
+                for(int i=0; i<destSize; i++){
+                    Log.e(TAG, "inside For Loop to grab names");
+                    listOfDestNames.add(i,destinations.get(i).name);
+                    Log.e(TAG, "Past add to Names ArrayList");
+                    listOfDestLong[i] = destinations.get(i).longitude;
+                    listOfDestLat[i] = destinations.get(i).latitude;
 
-                for(int i=0; i<lastIndex; i++){
-                    String locString;
-                    locString = destinations.get(i).longitude + "," + destinations.get(i).latitude;
-
-                    if(i == (lastIndex-1)){
-                    urlString = urlString + locString;
-                    }
-                    else{
-                        urlString = urlString + locString + "|";
-                    }
                 }
 
-                urlString = urlString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
 
-                intent.putExtra("dString", urlString);
+                intent.putExtra("dName", listOfDestNames);
+                intent.putExtra("dLong", listOfDestLong);
+                intent.putExtra("dLat", listOfDestLat);
 
                 startActivityForResult(intent, 1);
             }
