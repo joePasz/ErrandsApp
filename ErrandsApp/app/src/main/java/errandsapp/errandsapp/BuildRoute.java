@@ -25,6 +25,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -101,8 +103,8 @@ public class BuildRoute extends Activity {
 
         }
 
-        originName = destinations.get(0).longitude + "," + destinations.get(0).latitude;
-        deName = destinations.get(lastIndex).longitude + "," + destinations.get(lastIndex).latitude;
+        originName = destinations.get(0).latitude + "," + destinations.get(0).longitude;
+        deName = destinations.get(lastIndex).latitude + "," + destinations.get(lastIndex).longitude;
 
 
         for(int i=1; i<lastIndex; i++){
@@ -110,7 +112,7 @@ public class BuildRoute extends Activity {
                 urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
             }
             String locString;
-            locString = destinations.get(i).longitude + "," + destinations.get(i).latitude;
+            locString = destinations.get(i).latitude + "," + destinations.get(i).longitude;
 
             if(i == (lastIndex-1)){
                 urlString = urlString + locString;
@@ -123,7 +125,7 @@ public class BuildRoute extends Activity {
         urlString = urlString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
 
         displayUrl = urlString;
-        textView.setText(displayUrl);
+//        textView.setText(displayUrl);
 
         Log.e(TAG, displayUrl);
         if(displayUrl != null) {
@@ -148,7 +150,8 @@ public class BuildRoute extends Activity {
                             for(int i2 = 0; i2 < legs.length();i2++) {
                                 leg = legs.getJSONObject(i2);
                                 JSONObject location = (JSONObject) leg.get("start_location");
-                                Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+                                Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
+                                //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
                                 orderedDestinations.add(tempDest);
 //                                steps = leg.getJSONArray("steps"); // EDIT : I had somehow missed this line before when copying the code from IDE to the website
 //                                int nsteps = steps.length() ;
@@ -164,7 +167,8 @@ public class BuildRoute extends Activity {
                             }
                             leg = legs.getJSONObject(legs.length()-1);
                             JSONObject location = (JSONObject) leg.get("end_location");
-                            Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+                            Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
+                            //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
                             orderedDestinations.add(tempDest);
 
                         }
@@ -173,7 +177,7 @@ public class BuildRoute extends Activity {
                     }
                     Message msg = Message.obtain();
                     msg.what = 0;
-                    //handler.sendMessage(msg);
+                    handler.sendMessage(msg);
 
                 }
 
@@ -275,11 +279,35 @@ public class BuildRoute extends Activity {
             // not sure what inflates does, but I think I am doing this right....
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.column_1)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.column_1)).setText(orderedDestinations.get(i).name);
             row.setTag(i);
             table.addView(row);
         }
         return true;
     }
 
+    public Destination destinationGivenLocation(double latitude, double longitude) {
+        int lowestIndex = 0;
+        double lowestAmount = 999999.0;
+        for(int i = 0; i < destinations.size(); i++) {
+            Destination tempDest = destinations.get(i);
+            double distance = findDistance(tempDest.longitude, longitude, tempDest.latitude, latitude);
+            //distance = Math.abs(distance);
+            if(distance < lowestAmount) {
+                lowestAmount = distance;
+                lowestIndex = i;
+            }
+        }
+        return destinations.get(lowestIndex);
+    }
+
+    public static double findDistance(double long1, double long2, double lat1, double lat2) {
+//        double longDist = long2-long1;
+//        longDist = Math.pow(longDist, 2);
+//        double latDist = lat2-lat1;
+//        latDist = Math.pow(latDist, 2);
+//        double result = Math.sqrt(longDist+latDist);
+//        return result;
+        return Math.sqrt(Math.pow(long2-long1,2.0)+Math.pow(lat2-lat1,2.0));
+    }
 }

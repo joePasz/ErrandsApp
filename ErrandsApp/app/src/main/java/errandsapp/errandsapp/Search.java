@@ -118,7 +118,7 @@ public class Search extends Activity implements LocationListener{
                                 JSONObject result = (JSONObject)resultsJSONArray.get(i);
                                 JSONObject geometry = (JSONObject) result.get("geometry");
                                 JSONObject location = (JSONObject) geometry.get("location");
-                                Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lat"),(Double) location.get("lng"));
+                                Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lng"),(Double) location.get("lat"));
                                 tempDest.address = result.getString("formatted_address");
                                 destinations.add(tempDest);
                             }

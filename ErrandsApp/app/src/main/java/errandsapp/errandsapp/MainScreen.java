@@ -53,6 +53,7 @@ public class MainScreen extends Activity implements LocationListener {
         //Just an ugly, quick, and dirty way to build an array of these destination object
 //        Destination dest = new Destination("Starbucks",32.04947,-40.2381);
         destinations = new ArrayList<Destination>();
+        buildTestData();
 //        for(int i = 0; i < 5; i++){
 //            destinations.add(dest);
 //        }
@@ -231,6 +232,15 @@ public class MainScreen extends Activity implements LocationListener {
                 break;
             }
         }
+    }
+
+    public void buildTestData() {
+        Destination tempDist1= new Destination("The Ohio State University - Dreese Laboratories", -83.015941, 40.002357);
+        Destination tempDist2= new Destination("Raising Cane's", -83.007699, 39.999338);
+        Destination tempDist3= new Destination("Chipotle Mexican Grill",-83.007168, 39.997513);
+        destinations.add(tempDist1);
+        destinations.add(tempDist2);
+        destinations.add(tempDist3);
     }
 
     @Override
