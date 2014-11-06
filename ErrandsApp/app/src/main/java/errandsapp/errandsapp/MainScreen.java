@@ -12,12 +12,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -156,6 +155,21 @@ public class MainScreen extends Activity implements LocationListener {
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
+            row.setTag(i);
+            row.setOnLongClickListener(new View.OnLongClickListener() {
+                public boolean onLongClick(View arg0) {
+//                    arg0.setBackgroundColor(Color.rgb(226, 11, 11));
+                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
+                    ((TextView)longClickView.findViewById(R.id.column_1)).setText("TEST");
+                    int tag = (Integer)arg0.getTag();
+                    ViewGroup tempTable = (ViewGroup)arg0.getParent();
+                    int index = tempTable.indexOfChild(arg0);
+                    tempTable.removeView(arg0);
+                    tempTable.addView(longClickView, index);
+
+                    return true;
+                }
+            });
             table.addView(row);
         }
         return true;
