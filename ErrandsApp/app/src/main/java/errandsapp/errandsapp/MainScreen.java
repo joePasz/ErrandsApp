@@ -159,11 +159,13 @@ public class MainScreen extends Activity implements LocationListener {
             row.setOnLongClickListener(new View.OnLongClickListener() {
                 public boolean onLongClick(View arg0) {
 //                    arg0.setBackgroundColor(Color.rgb(226, 11, 11));
-                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-                    ((TextView)longClickView.findViewById(R.id.column_1)).setText("TEST");
+                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
+//                    ((TextView)longClickView.findViewById(R.id.column_1)).setText("TEST");
+
                     int tag = (Integer)arg0.getTag();
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
+                    ((Button)longClickView.findViewById(R.id.delete)).setTag(tag);
                     tempTable.removeView(arg0);
                     tempTable.addView(longClickView, index);
 
@@ -224,6 +226,18 @@ public class MainScreen extends Activity implements LocationListener {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void deleteClick(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            ViewGroup tempRow = (ViewGroup)v.getParent();
+            ViewGroup tempTable = (ViewGroup)tempRow.getParent();
+            tempTable.removeView(tempRow);
+            destinations.remove(cellNumber);
+        }
+        buildTable();
+    }
+
 
     //This method is called once the activity it started ends
     //(When the Search AActivity finishes, this is called)
