@@ -30,6 +30,15 @@ public class MainScreen extends Activity implements LocationListener {
     private Button searchButton;
     private Button addCurrentLocationButton;
     private Button buildRouteButton;
+    private Button deleteDestButton;
+    private Button favoriteDestButton;
+    private Button destStartButton;
+    private Button destEndButton;
+
+    private Destination startLocation;
+    private Destination endLocation;
+
+
     private TableLayout table;
     private LocationManager locationManager;
     private Location currentLocation;
@@ -76,6 +85,7 @@ public class MainScreen extends Activity implements LocationListener {
                 Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
             }
         }
+
 
 
         table = (TableLayout)findViewById(R.id.table);
@@ -261,6 +271,23 @@ public class MainScreen extends Activity implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    /**
+     * Sorts destinations and appropriately puts the first destination at the front of the array and the final destination at the end of the array.
+     * Destination array must have size > 2
+     */
+    public void sortDestinations() {
+        for(int i = 0; i < destinations.size(); i++){
+            Destination test = destinations.get(i);
+            if(test.equals(startLocation)){
+                destinations.remove(i);
+            } else if(test.equals(endLocation)){
+                destinations.remove(i);
+            }
+        }
+        destinations.add(0,startLocation);
+        destinations.add(endLocation);
     }
 }
 

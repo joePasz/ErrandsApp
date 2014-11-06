@@ -60,16 +60,18 @@
                 android:text="Destinations"
                 android:paddingTop="5dp"
                 android:textStyle="bold"
+                android:textSize="18dp"
                 android:layout_weight="1"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Long:Lat"
+                android:text="Start/End"
                 android:id="@+id/LongLat"
                 android:layout_gravity="right"
                 android:layout_weight="1"
                 android:gravity="right"
+                android:textSize="18dp"
                 android:paddingTop="5dp"/>
         </LinearLayout>
 

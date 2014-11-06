@@ -175,7 +175,7 @@ public class Search extends Activity implements LocationListener{
     public void clickHandlerCell(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
-            Log.e(TAG, "cell: " + v.getTag() + " Clicked!!!!");
+            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
             Destination clickedDest = destinations.get(cellNumber);
 
             Intent resultIntent = new Intent();

@@ -12,6 +12,7 @@
         android:layout_weight="1"
         android:text="Favorites"
         android:padding="5dp"
+        android:id="@+id/long_click_favorite_button"
         />
     <Button
         android:layout_width="match_parent"
@@ -19,6 +20,7 @@
         android:layout_weight="1"
         android:text="Delete"
         android:padding="5dp"
+        android:id="@+id/long_click_delete_button"
         />
 
 </LinearLayout>
