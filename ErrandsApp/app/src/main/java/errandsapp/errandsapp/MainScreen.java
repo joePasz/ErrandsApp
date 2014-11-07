@@ -151,10 +151,12 @@ public class MainScreen extends Activity implements LocationListener {
     //it from scratch based on the contents of the Array List Destinations
     public boolean buildTable() {
         int count = table.getChildCount();
-        for (int i = 0; i < count; i++) {
+//        table.removeAllViews();
+        for (int i = count - 1; i >= 0; i--) {
             View child = table.getChildAt(i);
 
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
+            if (child instanceof TableRow) table.removeView(child);
         }
 
         //Dynamically adds rows based on the size of the destinations array
@@ -171,11 +173,13 @@ public class MainScreen extends Activity implements LocationListener {
 //                    arg0.setBackgroundColor(Color.rgb(226, 11, 11));
                     TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
 //                    ((TextView)longClickView.findViewById(R.id.column_1)).setText("TEST");
+                    int height =  arg0.getHeight();
 
                     int tag = (Integer)arg0.getTag();
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
                     ((Button)longClickView.findViewById(R.id.delete)).setTag(tag);
+                    longClickView.setMinimumHeight(height);
                     tempTable.removeView(arg0);
                     tempTable.addView(longClickView, index);
 

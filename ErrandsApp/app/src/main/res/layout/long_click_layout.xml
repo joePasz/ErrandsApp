@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="match_parent"
     android:longClickable="true"
-    android:background="#DDDDDD">
+    android:background="#EEEEEE">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_weight="5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical">
 
     <Button
         android:id="@+id/cancel"
@@ -20,6 +25,7 @@
         android:padding="3dp"
         android:clickable="true"
         android:onClick="cancelClick"
+        android:layout_gravity="center_vertical"
         />
     <Button
         android:id="@+id/favorite"
@@ -28,6 +34,7 @@
         android:layout_weight="1"
         android:text="Favorites"
         android:padding="3dp"
+        android:layout_gravity="center_vertical"
         />
     <Button
         android:id="@+id/delete"
@@ -38,8 +45,14 @@
         android:padding="3dp"
         android:clickable="true"
         android:onClick="deleteClick"
+        android:layout_gravity="center_vertical"
         />
     </LinearLayout>
-
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_gravity="bottom"/>
+</LinearLayout>
 
 </TableRow>
