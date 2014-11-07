@@ -248,6 +248,10 @@ public class MainScreen extends Activity implements LocationListener {
         buildTable();
     }
 
+    public void cancelClick(View v){
+        buildTable();
+    }
+
 
     //This method is called once the activity it started ends
     //(When the Search AActivity finishes, this is called)
