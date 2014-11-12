@@ -336,4 +336,8 @@ public class BuildRoute extends Activity {
 //        return result;
         return Math.sqrt(Math.pow(long2-long1,2.0)+Math.pow(lat2-lat1,2.0));
     }
+
+    public void clickHandlerCell(View v){
+
+    }
 }
