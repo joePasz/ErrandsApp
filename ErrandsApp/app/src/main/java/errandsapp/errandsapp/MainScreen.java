@@ -289,6 +289,9 @@ public class MainScreen extends Activity implements LocationListener {
         Destination tempDist3= new Destination("Chipotle Mexican Grill",-83.007168, 39.997513);
         Destination tempDist4= new Destination("Lazenby Hall",-83.015635, 39.998839);
         Destination tempDist5= new Destination("Caffe Apropos",-83.017099, 39.983966);
+
+
+
         destinations.add(tempDist1);
         destinations.add(tempDist2);
         destinations.add(tempDist4);
