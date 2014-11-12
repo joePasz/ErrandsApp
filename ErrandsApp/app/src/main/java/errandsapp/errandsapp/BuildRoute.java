@@ -12,12 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-
 import android.widget.TextView;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,8 +25,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -38,6 +36,8 @@ public class BuildRoute extends Activity {
     private ArrayList<Destination> orderedDestinations;
     private TableLayout table;
     LayoutInflater inflater;
+    private ArrayList<LatLng> stepLocations;
+    private Button buildMapButton;
 
     private ArrayList<String> listOfDestNames;
     private double[] listOfDestLong;
@@ -45,7 +45,7 @@ public class BuildRoute extends Activity {
 
 
     private String displayUrl;
-    private TextView textView;
+//    private TextView textView;
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -69,11 +69,13 @@ public class BuildRoute extends Activity {
         String originName;
         String deName;
 
+
+
         listOfDestNames = new ArrayList<String>();
         destinations = new ArrayList<Destination>();
         orderedDestinations = new ArrayList<Destination>();
 
-        textView = (TextView)findViewById(R.id.Url);
+//        textView = (TextView)findViewById(R.id.Url);
 
         Intent intent = getIntent();
         listOfDestNames = intent.getStringArrayListExtra("dName");
@@ -127,12 +129,34 @@ public class BuildRoute extends Activity {
         displayUrl = urlString;
 //        textView.setText(displayUrl);
 
+        buildMapButton = (Button) findViewById(R.id.buildMapButton);
+        buildMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mapIntent = new Intent(getApplicationContext(), Map.class);
+
+                double[] stepLongs = new double[stepLocations.size()];
+                double[] stepLats = new double[stepLocations.size()];
+
+                for(int i=0; i<stepLocations.size(); i++){
+                    stepLongs[i] = stepLocations.get(i).longitude;
+                    stepLats[i] = stepLocations.get(i).latitude;
+                }
+
+                mapIntent.putExtra("sLong", stepLongs);
+                mapIntent.putExtra("sLat", stepLats);
+                startActivity(mapIntent);
+            }
+
+        });
+
         Log.e(TAG, displayUrl);
         if(displayUrl != null) {
             new Thread(new Runnable(){
                 public void run(){
                     String URLString = displayUrl;
                     String searchResultString = getUrlContents(URLString);
+
 
                     //This is the parsing code for Search, not Build Route, This will cause it to crash
                     //We need to fix this parser for build route
@@ -143,32 +167,34 @@ public class BuildRoute extends Activity {
                         JSONArray legs ;
                         JSONObject leg ;
                         JSONArray steps ;
+                        JSONObject step ;
                         JSONObject dist;
                         Integer distance ;
+                        stepLocations = new ArrayList<LatLng>();
                         if(route.has("legs")) {
                             legs = route.getJSONArray("legs");
                             for(int i2 = 0; i2 < legs.length();i2++) {
                                 leg = legs.getJSONObject(i2);
                                 JSONObject location = (JSONObject) leg.get("start_location");
                                 Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
-                                //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
                                 orderedDestinations.add(tempDest);
-//                                steps = leg.getJSONArray("steps"); // EDIT : I had somehow missed this line before when copying the code from IDE to the website
-//                                int nsteps = steps.length() ;
-//                                for(int i=0;i<nsteps;i++) {
-//                                    JSONObject step = steps.getJSONObject(i);
-//                                    if(step.has("distance")) {
-//                                        dist = (JSONObject) step.get("distance");// throws exception
-//                                        //I would like to take the distance value and do something with it
-//                                        //if(dist.has("value"))
-//                                        //  distance = (Integer) dist.get("value") ;
-//                                    }
-//                                }
+                            }
+                            for(int i2 = 0; i2 < legs.length();i2++) {
+                                leg = legs.getJSONObject(i2);
+                                if(leg.has("steps")) {
+                                    steps = leg.getJSONArray("steps");
+                                    for(int i3 = 0; i3 < steps.length();i3++) {
+                                        step = steps.getJSONObject(i3);
+                                        JSONObject stepLocation = (JSONObject) step.get("start_location");
+                                        stepLocations.add(new LatLng((Double) stepLocation.get("lat"),(Double) stepLocation.get("lng")));
+                                    }
+                                }
                             }
                             leg = legs.getJSONObject(legs.length()-1);
                             JSONObject location = (JSONObject) leg.get("end_location");
                             Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
                             //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+                            stepLocations.add(new LatLng((Double) location.get("lat"),(Double) location.get("lng")));
                             orderedDestinations.add(tempDest);
 
                         }

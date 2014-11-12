@@ -8,18 +8,18 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="errandsapp.errandsapp.BuildRoute">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Url"
-        android:id="@+id/Url"
-        android:layout_below="@+id/searchBar"
-        android:layout_centerHorizontal="true" />
 
     <TableLayout
         android:id="@+id/table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/buildMapButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Build Map"
+            android:layout_gravity="center_horizontal"/>
 
     </TableLayout>
 
