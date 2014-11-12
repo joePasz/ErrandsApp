@@ -105,10 +105,14 @@ public class MainScreen extends Activity implements LocationListener {
         addCurrentLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
+                /*Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
                 destinations.add(dest);
                 //rebuild table
-                buildTable();
+                buildTable();*/
+
+                Intent intent = new Intent(getApplicationContext(), Map.class);
+
+                startActivity(intent);
             }
 
         });

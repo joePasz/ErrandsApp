@@ -42,10 +42,14 @@
                 android:value="errandsapp.errandsapp.MainScreen" />
         </activity>
 
+        <activity android:name=".Map"/>
+
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"	android:value="AIzaSyDfKtM-4A3xVX8Ge3kwZZhKEzi8JlTLAAw"/>
+
+        <meta-data
+            android:name="com.google.android.gms.version" android:value="4242000" />
     </application>
 
-    <meta-data
-        android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 </manifest>
