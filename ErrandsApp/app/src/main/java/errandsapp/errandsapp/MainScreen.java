@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -235,7 +236,8 @@ public class MainScreen extends Activity implements LocationListener {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_gps) {
+            clickGPS();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -307,6 +309,10 @@ public class MainScreen extends Activity implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    public void clickGPS(){
+        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
     }
 
     /**
