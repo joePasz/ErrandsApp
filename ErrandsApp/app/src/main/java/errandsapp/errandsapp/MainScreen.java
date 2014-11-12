@@ -118,6 +118,7 @@ public class MainScreen extends Activity implements LocationListener {
         buildRouteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                sortDestinations();
                 Intent intent = new Intent(getApplicationContext(), BuildRoute.class);
                 String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
                 Integer destSize = destinations.size();
@@ -286,9 +287,13 @@ public class MainScreen extends Activity implements LocationListener {
         Destination tempDist1= new Destination("The Ohio State University - Dreese Laboratories", -83.015941, 40.002357);
         Destination tempDist2= new Destination("Raising Cane's", -83.007699, 39.999338);
         Destination tempDist3= new Destination("Chipotle Mexican Grill",-83.007168, 39.997513);
+        Destination tempDist4= new Destination("Lazenby Hall",-83.015635, 39.998839);
+        Destination tempDist5= new Destination("Caffe Apropos",-83.017099, 39.983966);
         destinations.add(tempDist1);
         destinations.add(tempDist2);
+        destinations.add(tempDist4);
         destinations.add(tempDist3);
+        destinations.add(tempDist5);
     }
 
     @Override
@@ -328,8 +333,12 @@ public class MainScreen extends Activity implements LocationListener {
                 destinations.remove(i);
             }
         }
-        destinations.add(0,startLocation);
-        destinations.add(endLocation);
+        if(startLocation != null){
+            destinations.add(0,startLocation);
+        }
+        if(endLocation != null){
+            destinations.add(endLocation);
+        }
     }
 }
 

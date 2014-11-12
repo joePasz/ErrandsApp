@@ -111,7 +111,7 @@ public class BuildRoute extends Activity {
 
         for(int i=1; i<lastIndex; i++){
             if(i==1){
-                urlString = urlString + originName + "&destination=" + deName + "&waypoints=";
+                urlString = urlString + originName + "&destination=" + deName + "&waypoints=optimize:true|";
             }
             String locString;
             locString = destinations.get(i).latitude + "," + destinations.get(i).longitude;
