@@ -12,6 +12,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by JenniferTurner on 11/11/14.
@@ -21,13 +28,7 @@ public class Map extends FragmentActivity {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_map, container, false);
     }
-    import android.support.v4.app.FragmentActivity;
-    import android.os.Bundle;
 
-    import com.google.android.gms.maps.GoogleMap;
-    import com.google.android.gms.maps.SupportMapFragment;
-    import com.google.android.gms.maps.model.LatLng;
-    import com.google.android.gms.maps.model.MarkerOptions;
 
     public class MapDemoActivity extends FragmentActivity {
 
