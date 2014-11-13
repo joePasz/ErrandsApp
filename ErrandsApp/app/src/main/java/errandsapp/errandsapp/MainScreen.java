@@ -27,6 +27,7 @@ public class MainScreen extends Activity implements LocationListener {
 
 //    private Destination[] destinations;
     private ArrayList<Destination> destinations;
+    private ArrayList<Destination> recentDestinations;
     private Button searchButton;
     private Button addCurrentLocationButton;
     private Button buildRouteButton;
@@ -38,6 +39,7 @@ public class MainScreen extends Activity implements LocationListener {
     private Destination startLocation;
     private Destination endLocation;
 
+    private DatabaseHelper dbHelper;
 
     private TableLayout table;
     private LocationManager locationManager;
@@ -55,6 +57,12 @@ public class MainScreen extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_main_screen);
+
+        recentDestinations = new ArrayList<Destination>();
+
+        dbHelper = new DatabaseHelper(getApplicationContext());
+
+
 
         inflater = (LayoutInflater)this.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
@@ -106,9 +114,13 @@ public class MainScreen extends Activity implements LocationListener {
         addCurrentLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
-                destinations.add(dest);
+                //Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
+                //destinations.add(dest);
                 //rebuild table
+                //buildTable();
+
+                ArrayList<Destination> tempDests = dbHelper.selectAll();
+                destinations = tempDests;
                 buildTable();
             }
 
@@ -202,6 +214,8 @@ public class MainScreen extends Activity implements LocationListener {
 
     protected void onResume() {
         super.onResume();
+        ArrayList<Destination> tempDests = dbHelper.selectAll();
+        recentDestinations = tempDests;
         Log.e(TAG, "++ In onResume() ++");
     }
     protected void onStart() {
@@ -240,7 +254,11 @@ public class MainScreen extends Activity implements LocationListener {
         if (id == R.id.action_gps) {
             clickGPS();
             return true;
+        } else if (id == R.id.action_recent) {
+            clickRecent();
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -275,6 +293,7 @@ public class MainScreen extends Activity implements LocationListener {
                     Destination dest = new Destination(newText,newLong,newLat);
                     dest.address = data.getStringExtra("dAddress");
                     destinations.add(dest);
+                    addRecentDestination(dest);
                     //rebuild table
                     buildTable();
                 }
@@ -320,6 +339,12 @@ public class MainScreen extends Activity implements LocationListener {
         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
     }
 
+    public void clickRecent(){
+        Intent intent = new Intent(getApplicationContext(), Recent.class);
+        //starts the search activity with an id of 0
+        startActivity(intent);
+    }
+
     /**
      * Sorts destinations and appropriately puts the first destination at the front of the array and the final destination at the end of the array.
      * Destination array must have size > 2
@@ -339,6 +364,41 @@ public class MainScreen extends Activity implements LocationListener {
         if(endLocation != null){
             destinations.add(endLocation);
         }
+    }
+
+    public void addRecentDestination(Destination destination) {
+        recentDestinations.add(0, destination);
+        if(recentDestinations.size() > 4) {
+            recentDestinations.remove(recentDestinations.size()-1);
+        }
+        dbHelper.deleteAll();
+        for(int i = 0; i < recentDestinations.size(); i++) {
+            Destination rDest = recentDestinations.get(i);
+            dbHelper.insert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
+        }
+    }
+
+    protected	void	onSaveInstanceState	(Bundle	outState){
+        super.onSaveInstanceState(outState);
+        Log.e(TAG, "++ SAVING!!! ++");
+        dbHelper.deleteAll();
+        for(int i = 0; i < recentDestinations.size(); i++) {
+            Destination rDest = recentDestinations.get(i);
+            dbHelper.insert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
+        }
+
+    }
+
+
+    protected	void	onRestoreInstanceState	(Bundle	savedInstanceState)	{
+        super.onRestoreInstanceState(savedInstanceState);
+        restoreRecent();
+//        ArrayList<Destination> tempDests = dbHelper.selectAll();
+//        recentDestinations = tempDests;
+    }
+
+    public void restoreRecent() {
+
     }
 }
 

@@ -5,5 +5,9 @@
         android:title="GPS Settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_recent"
+        android:title="Recent Locations"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
 
 </menu>

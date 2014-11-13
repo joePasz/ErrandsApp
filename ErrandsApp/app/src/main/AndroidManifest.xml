@@ -2,16 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="errandsapp.errandsapp" >
 
-    <uses-permission	android:name="android.permission.INTERNET"/>
-    <uses-permission	android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission	android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission	android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission	android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission    android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
-    <uses-library	android:name="com.google.android.maps"/>
+    <uses-library android:name="com.google.android.maps" />
 
-    <uses-feature	android:glEsVersion="0x00020000"	android:required="true"/>
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -41,15 +43,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="errandsapp.errandsapp.MainScreen" />
         </activity>
-
-        <activity android:name=".Map"/>
-
+        <activity android:name=".Map" />
 
         <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"	android:value="AIzaSyDfKtM-4A3xVX8Ge3kwZZhKEzi8JlTLAAw"/>
-
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDfKtM-4A3xVX8Ge3kwZZhKEzi8JlTLAAw" />
         <meta-data
-            android:name="com.google.android.gms.version" android:value="4242000" />
+            android:name="com.google.android.gms.version"
+            android:value="4242000" />
+
+        <activity
+            android:name=".Recent"
+            android:label="@string/title_activity_recent"
+            android:parentActivityName=".MainScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="errandsapp.errandsapp.MainScreen" />
+        </activity>
     </application>
 
 </manifest>
