@@ -58,9 +58,10 @@
          android:layout_weight="1"
          android:textSize="8dp"
          android:layout_gravity="center"
-         android:background="#00CC00"
+         android:background="#99EB99"
          android:padding="3dp"
          android:layout_margin="5dp"
+         android:onClick="startClicked"
          />
         <Button android:id="@+id/end_Button"
         android:text="@string/end_button"
@@ -69,9 +70,10 @@
         android:layout_weight="1"
         android:textSize="8dp"
         android:layout_gravity="center"
-        android:background="#FF0000"
+        android:background="#FF9999"
         android:padding="3dp"
         android:layout_margin="5dp"
+        android:onClick="endClicked"
         />
 
 

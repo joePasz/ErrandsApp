@@ -130,10 +130,12 @@ public class MainScreen extends Activity implements LocationListener {
         buildRouteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                sortDestinations();
+                ArrayList<Destination> tempDest;
+
+                tempDest = sortDestinations();
                 Intent intent = new Intent(getApplicationContext(), BuildRoute.class);
                 String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-                Integer destSize = destinations.size();
+                Integer destSize = tempDest.size();
 
                 listOfDestLong = new double[destSize];
                 listOfDestLat = new double[destSize];
@@ -141,10 +143,10 @@ public class MainScreen extends Activity implements LocationListener {
 
                 for(int i=0; i<destSize; i++){
                     Log.e(TAG, "inside For Loop to grab names");
-                    listOfDestNames.add(i,destinations.get(i).name);
+                    listOfDestNames.add(i,tempDest.get(i).name);
                     Log.e(TAG, "Past add to Names ArrayList");
-                    listOfDestLong[i] = destinations.get(i).longitude;
-                    listOfDestLat[i] = destinations.get(i).latitude;
+                    listOfDestLong[i] = tempDest.get(i).longitude;
+                    listOfDestLat[i] = tempDest.get(i).latitude;
 
                 }
 
@@ -172,7 +174,6 @@ public class MainScreen extends Activity implements LocationListener {
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
             if (child instanceof TableRow) table.removeView(child);
         }
-
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
@@ -181,6 +182,9 @@ public class MainScreen extends Activity implements LocationListener {
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
+            row.findViewById(R.id.start_button).setTag(i);
+            row.findViewById(R.id.end_Button).setTag(i);
+
             row.setTag(i);
             row.setOnLongClickListener(new View.OnLongClickListener() {
                 public boolean onLongClick(View arg0) {
@@ -202,6 +206,14 @@ public class MainScreen extends Activity implements LocationListener {
             });
             table.addView(row);
         }
+        if(startLocation != null){
+
+            colorStarts(destinations.indexOf(startLocation));
+        }
+
+        if(endLocation != null){
+            colorEnds(destinations.indexOf(endLocation));
+        }
         return true;
     }
 
@@ -216,6 +228,9 @@ public class MainScreen extends Activity implements LocationListener {
         super.onResume();
         ArrayList<Destination> tempDests = dbHelper.selectAll();
         recentDestinations = tempDests;
+        if(destinations.size() > 0){
+            buildTable();
+        }
         Log.e(TAG, "++ In onResume() ++");
     }
     protected void onStart() {
@@ -268,6 +283,13 @@ public class MainScreen extends Activity implements LocationListener {
             ViewGroup tempRow = (ViewGroup)v.getParent();
             ViewGroup tempTable = (ViewGroup)tempRow.getParent();
             tempTable.removeView(tempRow);
+
+            if(startLocation == destinations.get(cellNumber)){
+                startLocation = null;
+            }
+            if(endLocation == destinations.get(cellNumber)){
+                endLocation = null;
+            }
             destinations.remove(cellNumber);
         }
         buildTable();
@@ -308,11 +330,14 @@ public class MainScreen extends Activity implements LocationListener {
         Destination tempDist3= new Destination("Chipotle Mexican Grill",-83.007168, 39.997513);
         Destination tempDist4= new Destination("Lazenby Hall",-83.015635, 39.998839);
         Destination tempDist5= new Destination("Caffe Apropos",-83.017099, 39.983966);
+
+
         destinations.add(tempDist1);
         destinations.add(tempDist2);
         destinations.add(tempDist4);
         destinations.add(tempDist3);
         destinations.add(tempDist5);
+
     }
 
     @Override
@@ -349,21 +374,32 @@ public class MainScreen extends Activity implements LocationListener {
      * Sorts destinations and appropriately puts the first destination at the front of the array and the final destination at the end of the array.
      * Destination array must have size > 2
      */
-    public void sortDestinations() {
-        for(int i = 0; i < destinations.size(); i++){
-            Destination test = destinations.get(i);
-            if(test.equals(startLocation)){
-                destinations.remove(i);
-            } else if(test.equals(endLocation)){
-                destinations.remove(i);
+    public ArrayList<Destination> sortDestinations() {
+        ArrayList<Destination> tempDest;
+        tempDest = new ArrayList<Destination>(destinations);
+        for(int i = 0; i < tempDest.size(); i++) {
+            Destination test = tempDest.get(i);
+            if (startLocation != null && test.name.equals(startLocation.name)) {
+                tempDest.remove(i);
+                break;
+            }
+        }
+
+        for(int i=0; i<tempDest.size(); i++) {
+            Destination test = tempDest.get(i);
+            if(endLocation !=null && test.name.equals(endLocation.name)){
+                tempDest.remove(i);
+                break;
             }
         }
         if(startLocation != null){
-            destinations.add(0,startLocation);
+            tempDest.add(0,startLocation);
         }
         if(endLocation != null){
-            destinations.add(endLocation);
+            tempDest.add(endLocation);
         }
+
+        return tempDest;
     }
 
     public void addRecentDestination(Destination destination) {
@@ -400,5 +436,67 @@ public class MainScreen extends Activity implements LocationListener {
     public void restoreRecent() {
 
     }
+
+    public void startClicked(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
+            colorStarts(cellNumber);
+            startLocation = destinations.get(cellNumber);
+
+
+        }
+    }
+
+    public void endClicked(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
+            colorEnds(cellNumber);
+            endLocation = destinations.get(cellNumber);
+
+
+        }
+    }
+
+    public void colorStarts(int i){
+        int count = table.getChildCount();
+        for (int j = count - 1; j >= 0; j--) {
+            View child = table.getChildAt(j);
+
+            if (child instanceof TableRow){
+                Button startTemp = (Button)child.findViewById(R.id.start_button);
+                if ((Integer)startTemp.getTag() == i){
+                    startTemp.setBackgroundColor(0xFF00CC00);
+
+                }
+                else{
+                    startTemp.setBackgroundColor(0xFF99EB99);
+                }
+
+            };
+        }
+    }
+
+    public void colorEnds(int i){
+        int count = table.getChildCount();
+        for (int j = count - 1; j >= 0; j--) {
+            View child = table.getChildAt(j);
+
+            if (child instanceof TableRow){
+                Button endTemp = (Button)child.findViewById(R.id.end_Button);
+                if ((Integer)endTemp.getTag() == i){
+                    endTemp.setBackgroundColor(0xFFFF0000);
+
+                }
+                else{
+                    endTemp.setBackgroundColor(0xFFFF9999);
+                }
+
+            };
+        }
+
+    }
+
 }
 
