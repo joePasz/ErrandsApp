@@ -3,6 +3,7 @@ package errandsapp.errandsapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -169,6 +170,9 @@ public class MainScreen extends Activity implements LocationListener {
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
+            row.findViewById(R.id.start_button).setTag(i);
+            row.findViewById(R.id.end_Button).setTag(i);
+
             row.setTag(i);
             row.setOnLongClickListener(new View.OnLongClickListener() {
                 public boolean onLongClick(View arg0) {
@@ -330,9 +334,9 @@ public class MainScreen extends Activity implements LocationListener {
     public void sortDestinations() {
         for(int i = 0; i < destinations.size(); i++){
             Destination test = destinations.get(i);
-            if(test.equals(startLocation)){
+            if(startLocation !=null && test.name.equals(startLocation.name)){
                 destinations.remove(i);
-            } else if(test.equals(endLocation)){
+            } else if(endLocation !=null && test.name.equals(endLocation.name)){
                 destinations.remove(i);
             }
         }
@@ -341,6 +345,52 @@ public class MainScreen extends Activity implements LocationListener {
         }
         if(endLocation != null){
             destinations.add(endLocation);
+        }
+    }
+
+    public void startClicked(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
+
+            int count = table.getChildCount();
+
+            for (int i = count - 1; i >= 0; i--) {
+                View child = table.getChildAt(i);
+
+                if (child instanceof TableRow){
+                    child.findViewById(R.id.start_button).setBackgroundColor(0xFF99EB99);
+                };
+            }
+
+            v.setBackgroundColor(0xFF00CC00);
+
+            startLocation = destinations.get(cellNumber);
+
+
+        }
+    }
+
+    public void endClicked(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
+
+            int count = table.getChildCount();
+
+            for (int i = count - 1; i >= 0; i--) {
+                View child = table.getChildAt(i);
+
+                if (child instanceof TableRow){
+                    child.findViewById(R.id.end_Button).setBackgroundColor(0xFFFF9999);
+                };
+            }
+
+            v.setBackgroundColor(0xFFFF0000);
+
+            endLocation = destinations.get(cellNumber);
+
+
         }
     }
 }
