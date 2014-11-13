@@ -291,12 +291,12 @@ public class MainScreen extends Activity implements LocationListener {
         Destination tempDist5= new Destination("Caffe Apropos",-83.017099, 39.983966);
 
 
-
         destinations.add(tempDist1);
         destinations.add(tempDist2);
         destinations.add(tempDist4);
         destinations.add(tempDist3);
         destinations.add(tempDist5);
+
     }
 
     @Override

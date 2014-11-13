@@ -10,7 +10,7 @@
 
 
     <TableLayout
-        android:id="@+id/table"
+        android:id="@+id/tablebuttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -73,10 +73,29 @@
                 android:gravity="right"
                 android:textSize="18dp"
                 android:paddingTop="5dp"/>
+
+
         </LinearLayout>
 
+        <LinearLayout>
 
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TableLayout
+                    android:id="@+id/table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+
+                </TableLayout>
+            </ScrollView>
+
+        </LinearLayout>
     </TableLayout>
+
 
 
 </RelativeLayout>
