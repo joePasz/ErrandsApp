@@ -163,7 +163,6 @@ public class MainScreen extends Activity implements LocationListener {
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
             if (child instanceof TableRow) table.removeView(child);
         }
-
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
@@ -195,6 +194,14 @@ public class MainScreen extends Activity implements LocationListener {
                 }
             });
             table.addView(row);
+        }
+        if(startLocation != null){
+
+            colorStarts(destinations.indexOf(startLocation));
+        }
+
+        if(endLocation != null){
+            colorEnds(destinations.indexOf(endLocation));
         }
         return true;
     }
@@ -259,6 +266,13 @@ public class MainScreen extends Activity implements LocationListener {
             ViewGroup tempRow = (ViewGroup)v.getParent();
             ViewGroup tempTable = (ViewGroup)tempRow.getParent();
             tempTable.removeView(tempRow);
+
+            if(startLocation == destinations.get(cellNumber)){
+                startLocation = null;
+            }
+            if(endLocation == destinations.get(cellNumber)){
+                endLocation = null;
+            }
             destinations.remove(cellNumber);
         }
         buildTable();
@@ -368,19 +382,7 @@ public class MainScreen extends Activity implements LocationListener {
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
             Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
-
-            int count = table.getChildCount();
-
-            for (int i = count - 1; i >= 0; i--) {
-                View child = table.getChildAt(i);
-
-                if (child instanceof TableRow){
-                    child.findViewById(R.id.start_button).setBackgroundColor(0xFF99EB99);
-                };
-            }
-
-            v.setBackgroundColor(0xFF00CC00);
-
+            colorStarts(cellNumber);
             startLocation = destinations.get(cellNumber);
 
 
@@ -391,23 +393,50 @@ public class MainScreen extends Activity implements LocationListener {
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
             Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
-
-            int count = table.getChildCount();
-
-            for (int i = count - 1; i >= 0; i--) {
-                View child = table.getChildAt(i);
-
-                if (child instanceof TableRow){
-                    child.findViewById(R.id.end_Button).setBackgroundColor(0xFFFF9999);
-                };
-            }
-
-            v.setBackgroundColor(0xFFFF0000);
-
+            colorEnds(cellNumber);
             endLocation = destinations.get(cellNumber);
 
 
         }
+    }
+
+    public void colorStarts(int i){
+        int count = table.getChildCount();
+        for (int j = count - 1; j >= 0; j--) {
+            View child = table.getChildAt(j);
+
+            if (child instanceof TableRow){
+                Button startTemp = (Button)child.findViewById(R.id.start_button);
+                if ((Integer)startTemp.getTag() == i){
+                    startTemp.setBackgroundColor(0xFF00CC00);
+
+                }
+                else{
+                    startTemp.setBackgroundColor(0xFF99EB99);
+                }
+
+            };
+        }
+    }
+
+    public void colorEnds(int i){
+        int count = table.getChildCount();
+        for (int j = count - 1; j >= 0; j--) {
+            View child = table.getChildAt(j);
+
+            if (child instanceof TableRow){
+                Button endTemp = (Button)child.findViewById(R.id.end_Button);
+                if ((Integer)endTemp.getTag() == i){
+                    endTemp.setBackgroundColor(0xFFFF0000);
+
+                }
+                else{
+                    endTemp.setBackgroundColor(0xFFFF9999);
+                }
+
+            };
+        }
+
     }
 
 }
