@@ -119,10 +119,12 @@ public class MainScreen extends Activity implements LocationListener {
         buildRouteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                sortDestinations();
+                ArrayList<Destination> tempDest;
+
+                tempDest = sortDestinations();
                 Intent intent = new Intent(getApplicationContext(), BuildRoute.class);
                 String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-                Integer destSize = destinations.size();
+                Integer destSize = tempDest.size();
 
                 listOfDestLong = new double[destSize];
                 listOfDestLat = new double[destSize];
@@ -130,10 +132,10 @@ public class MainScreen extends Activity implements LocationListener {
 
                 for(int i=0; i<destSize; i++){
                     Log.e(TAG, "inside For Loop to grab names");
-                    listOfDestNames.add(i,destinations.get(i).name);
+                    listOfDestNames.add(i,tempDest.get(i).name);
                     Log.e(TAG, "Past add to Names ArrayList");
-                    listOfDestLong[i] = destinations.get(i).longitude;
-                    listOfDestLat[i] = destinations.get(i).latitude;
+                    listOfDestLong[i] = tempDest.get(i).longitude;
+                    listOfDestLat[i] = tempDest.get(i).latitude;
 
                 }
 
@@ -206,6 +208,9 @@ public class MainScreen extends Activity implements LocationListener {
 
     protected void onResume() {
         super.onResume();
+        if(destinations.size() > 0){
+            buildTable();
+        }
         Log.e(TAG, "++ In onResume() ++");
     }
     protected void onStart() {
@@ -331,21 +336,32 @@ public class MainScreen extends Activity implements LocationListener {
      * Sorts destinations and appropriately puts the first destination at the front of the array and the final destination at the end of the array.
      * Destination array must have size > 2
      */
-    public void sortDestinations() {
-        for(int i = 0; i < destinations.size(); i++){
-            Destination test = destinations.get(i);
-            if(startLocation !=null && test.name.equals(startLocation.name)){
-                destinations.remove(i);
-            } else if(endLocation !=null && test.name.equals(endLocation.name)){
-                destinations.remove(i);
+    public ArrayList<Destination> sortDestinations() {
+        ArrayList<Destination> tempDest;
+        tempDest = new ArrayList<Destination>(destinations);
+        for(int i = 0; i < tempDest.size(); i++) {
+            Destination test = tempDest.get(i);
+            if (startLocation != null && test.name.equals(startLocation.name)) {
+                tempDest.remove(i);
+                break;
+            }
+        }
+
+        for(int i=0; i<tempDest.size(); i++) {
+            Destination test = tempDest.get(i);
+            if(endLocation !=null && test.name.equals(endLocation.name)){
+                tempDest.remove(i);
+                break;
             }
         }
         if(startLocation != null){
-            destinations.add(0,startLocation);
+            tempDest.add(0,startLocation);
         }
         if(endLocation != null){
-            destinations.add(endLocation);
+            tempDest.add(endLocation);
         }
+
+        return tempDest;
     }
 
     public void startClicked(View v){
@@ -393,5 +409,6 @@ public class MainScreen extends Activity implements LocationListener {
 
         }
     }
+
 }
 
