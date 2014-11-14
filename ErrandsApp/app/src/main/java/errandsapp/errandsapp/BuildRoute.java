@@ -143,8 +143,22 @@ public class BuildRoute extends Activity {
                     stepLats[i] = stepLocations.get(i).latitude;
                 }
 
+                ArrayList<String> destNames = new ArrayList<String>();
+                double[] destLongs = new double[orderedDestinations.size()];
+                double[] destLats = new double[orderedDestinations.size()];
+
+                for(int i=0; i< orderedDestinations.size(); i++){
+                    Destination tempDest = orderedDestinations.get(i);
+                    destNames.add(tempDest.name);
+                    destLongs[i] = tempDest.longitude;
+                    destLats[i] = tempDest.latitude;
+                }
+
                 mapIntent.putExtra("sLong", stepLongs);
                 mapIntent.putExtra("sLat", stepLats);
+                mapIntent.putExtra("dLong", destLongs);
+                mapIntent.putExtra("dLat", destLats);
+                mapIntent.putExtra("dName", destNames);
                 startActivity(mapIntent);
             }
 
@@ -295,10 +309,6 @@ public class BuildRoute extends Activity {
         }
 
         //builds a header row, ugly, but proof of concept
-//        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-//        ((TextView)header.findViewById(R.id.desti)).setText("Destination Name");
-//        header.setTag(-1);
-//        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
@@ -329,12 +339,6 @@ public class BuildRoute extends Activity {
     }
 
     public static double findDistance(double long1, double long2, double lat1, double lat2) {
-//        double longDist = long2-long1;
-//        longDist = Math.pow(longDist, 2);
-//        double latDist = lat2-lat1;
-//        latDist = Math.pow(latDist, 2);
-//        double result = Math.sqrt(longDist+latDist);
-//        return result;
         return Math.sqrt(Math.pow(long2-long1,2.0)+Math.pow(lat2-lat1,2.0));
     }
 

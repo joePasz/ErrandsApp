@@ -14,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  * Created by JenniferTurner on 11/11/14.
  */
 public class Map extends FragmentActivity {
-
+    private ArrayList<Destination> orderedDestinations;
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
     private ArrayList<LatLng> stepCoordinates;
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +42,8 @@ public class Map extends FragmentActivity {
            googleMap.setMyLocationEnabled(true);
        }
 
+        orderedDestinations = new ArrayList<Destination>();
+
         Intent intent = getIntent();
         stepCoordinates = new ArrayList<LatLng>();
         double[] stepLongs = intent.getDoubleArrayExtra("sLong");
@@ -50,26 +53,27 @@ public class Map extends FragmentActivity {
             stepCoordinates.add(tempLocation);
         }
 
-        ArrayList<LatLng> coordinates = new ArrayList<LatLng>();
-        coordinates.add(new LatLng(37.35, -122.0));
-        coordinates.add(new LatLng(37.45, -122.0));
-        coordinates.add(new LatLng(37.45, -122.2));
-        coordinates.add(new LatLng(37.35, -122.2));
+        double[] destLongs = intent.getDoubleArrayExtra("dLong");
+        double[] destLats = intent.getDoubleArrayExtra("dLat");
+        ArrayList<String> destNames = intent.getStringArrayListExtra("dName");
+        for(int i = 0; i < destNames.size(); i++){
+            Destination tempDest = new Destination(destNames.get(i),destLongs[i], destLats[i]);
+            orderedDestinations.add(tempDest);
+        }
 
-       // Instantiates a new Polyline object and adds points to define a rectangle
-//       PolylineOptions rectOptions = new PolylineOptions()
-//               .add(new LatLng(37.35, -122.0))
-//               .add(new LatLng(37.45, -122.0))  // North of the previous point, but at the same longitude
-//               .add(new LatLng(37.45, -122.2))  // Same latitude, and 30km to the west
-//               .add(new LatLng(37.35, -122.2))  // Same longitude, and 16km to the south
-//               .add(new LatLng(37.35, -122.0)); // Closes the polyline.
-// Get back the mutable Polyline
         PolylineOptions rectOptions = new PolylineOptions();
         for(int i = 0; i < stepCoordinates.size(); i++) {
             rectOptions.add(stepCoordinates.get(i));
         }
 
        Polyline polyline = googleMap.addPolyline(rectOptions);
+
+        for(int i = 0; i < orderedDestinations.size(); i++) {
+            Destination tempDest = orderedDestinations.get(i);
+            googleMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(tempDest.latitude, tempDest.longitude))
+                    .title(tempDest.name));
+        }
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng coordinate : stepCoordinates) {
