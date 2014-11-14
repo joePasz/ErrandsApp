@@ -1,14 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:clickable="true"
-    android:onClick="clickHandlerCell"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
-<TextView
-    android:id="@+id/column_1"
-    android:textStyle="bold"
-    android:typeface="sans"
-    android:textSize="65px"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"/>
+    android:onClick="clickHandlerCell">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+            <!--Layout for the Destination and the Address -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/desti"
+                    android:textStyle="bold"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:padding="5dp"
+                    android:text="@string/destination_header"
+                    />
+
+                <TextView
+                    android:id="@+id/address"
+                    android:textStyle="normal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Address"
+                    android:layout_below="@id/desti"
+                    android:padding="5dp"
+                    />
+
+
+            </LinearLayout>
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_below="@+id/layout"/>
+    </LinearLayout>
+
 </TableRow>

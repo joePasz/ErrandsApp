@@ -2,15 +2,13 @@ package errandsapp.errandsapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -155,17 +153,18 @@ public class Search extends Activity implements LocationListener{
         }
 
         //builds a header row, ugly, but proof of concept
-        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
-        header.setTag(-1);
-        table.addView(header);
+//        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
+//        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
+//        header.setTag(-1);
+//        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
             // not sure what inflates does, but I think I am doing this right....
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.column_1)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
             row.setTag(i);
             table.addView(row);
         }
