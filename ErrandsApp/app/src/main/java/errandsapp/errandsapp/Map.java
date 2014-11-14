@@ -12,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -70,9 +71,17 @@ public class Map extends FragmentActivity {
 
         for(int i = 0; i < orderedDestinations.size(); i++) {
             Destination tempDest = orderedDestinations.get(i);
-            googleMap.addMarker(new MarkerOptions()
+            MarkerOptions marker = new MarkerOptions()
                     .position(new LatLng(tempDest.latitude, tempDest.longitude))
-                    .title(tempDest.name));
+                    .title((i+1) + ". " + tempDest.name);
+            if(i == 0) {
+                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            } else if (i == orderedDestinations.size()-1) {
+                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            } else {
+                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            }
+            googleMap.addMarker(marker);
         }
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
