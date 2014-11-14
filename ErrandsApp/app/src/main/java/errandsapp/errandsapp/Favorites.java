@@ -17,7 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class Recent extends Activity {
+public class Favorites extends Activity {
 
     private TableLayout table;
     LayoutInflater inflater;
@@ -28,10 +28,10 @@ public class Recent extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recent);
+        setContentView(R.layout.activity_favorites);
 
         dbHelper = new DatabaseHelper(getApplicationContext());
-        ArrayList<Destination> tempDests = dbHelper.rlSelectAll();
+        ArrayList<Destination> tempDests = dbHelper.favSelectAll();
         destinations = tempDests;
 
         inflater = (LayoutInflater)this.getSystemService
@@ -46,7 +46,7 @@ public class Recent extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.recent, menu);
+        getMenuInflater().inflate(R.menu.favorites, menu);
         return true;
     }
 
@@ -70,17 +70,19 @@ public class Recent extends Activity {
         }
 
         //builds a header row, ugly, but proof of concept
-        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
-        header.setTag(-1);
-        table.addView(header);
+//        TableRow header = (TableRow) inflater.inflate(R.layout.favorite_table_row_attributes, null);
+//        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
+//        header.setTag(-1);
+//        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
             // not sure what inflates does, but I think I am doing this right....
-            TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
+            TableRow row = (TableRow) inflater.inflate(R.layout.favorite_table_row_attributes, null);
             //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.column_1)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
+            row.findViewById(R.id.delete_Button).setTag(i);
             row.setTag(i);
             table.addView(row);
         }
@@ -93,6 +95,8 @@ public class Recent extends Activity {
             Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
             Destination clickedDest = destinations.get(cellNumber);
 
+
+
             Intent resultIntent = new Intent();
             resultIntent.putExtra("dName", clickedDest.name);
             resultIntent.putExtra("dLong", clickedDest.longitude);
@@ -102,6 +106,30 @@ public class Recent extends Activity {
 
             finish();
         }
+    }
+
+    public void deleteClicked(View v) {
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            ViewGroup tempRow = (ViewGroup)v.getParent();
+            ViewGroup tempTable = (ViewGroup)tempRow.getParent();
+            tempTable.removeView(tempRow);
+
+            destinations.remove(cellNumber);
+
+        }
+        buildTable();
+    }
+
+    protected void onPause() {
+        super.onPause();
+        dbHelper.favDeleteAll();
+        for(int i = 0; i < destinations.size(); i++) {
+            Destination fDest = destinations.get(i);
+            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+        }
+        Log.e(TAG, "++ In onPause() ++");
+
     }
 
     protected	void	onSaveInstanceState	(Bundle	outState){

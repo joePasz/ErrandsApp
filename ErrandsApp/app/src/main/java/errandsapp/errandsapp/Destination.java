@@ -16,4 +16,12 @@ public class Destination {
         this.longitude = longitude;
         this.latitude = latitude;
     }
+
+    public boolean equals(Destination otherDestination)
+    {
+        if(this.name.equals(otherDestination.name) && this.longitude == otherDestination.longitude && this.latitude == otherDestination.latitude) {
+            return true;
+        }
+        return false;
+    }
 }

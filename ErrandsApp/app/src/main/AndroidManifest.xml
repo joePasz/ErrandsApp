@@ -60,6 +60,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="errandsapp.errandsapp.MainScreen" />
         </activity>
+        <activity
+            android:name=".Favorites"
+            android:label="@string/title_activity_favorites"
+            android:parentActivityName=".MainScreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="errandsapp.errandsapp.MainScreen" />
+        </activity>
     </application>
 
 </manifest>

@@ -15,36 +15,74 @@ import java.util.ArrayList;
 public class DatabaseHelper {
     public	static	final	String	DATABASE_NAME	=	"Routes.db";
     public 	static	final	int	DATABASE_VERSION	=	1;
-    public	static	final	String	TABLE_NAME	=	"RecentLocations" ;
+    public	static	final	String	RL_TABLE_NAME	=	"RecentLocations" ;
+    public	static	final	String	FAV_TABLE_NAME	=	"FavoriteLocations" ;
     private Context context;
     private SQLiteDatabase db;
-    private SQLiteStatement insertStmt;
-    private	static	final	String	INSERT	=	"insert	into	"	+
-            TABLE_NAME	+	"(name,	longitude, latitude, address)	values	(?,	?, ?, ?)"	;
+    private SQLiteStatement rl_InsertStmt;
+    private SQLiteStatement fav_InsertStmt;
+    private	static	final	String	RL_INSERT	=	"insert	into	"	+
+            RL_TABLE_NAME	+	"(name,	longitude, latitude, address)	values	(?,	?, ?, ?)"	;
+    private	static	final	String	FAV_INSERT	=	"insert	into	"	+
+            FAV_TABLE_NAME	+	"(name,	longitude, latitude, address)	values	(?,	?, ?, ?)"	;
 
     public	DatabaseHelper(Context	context)	{
         this.context	=	context;
         DatabaseOpenHelper openHelper	=
                 new DatabaseOpenHelper(this.context);	//	this	creates	the	DB
         this.db	=	openHelper.getWritableDatabase();
-        this.insertStmt	=	this.db.compileStatement(INSERT);
+        this.rl_InsertStmt	=	this.db.compileStatement(RL_INSERT);
+        this.fav_InsertStmt	=	this.db.compileStatement(FAV_INSERT);
     }
 
-    public	long	insert(String	name, double longitude, double latitude, String address)	{
-        this.insertStmt.bindString(1,	name);
-        this.insertStmt.bindDouble(2, longitude);
-        this.insertStmt.bindDouble(3, latitude);
-        this.insertStmt.bindString(4,	address);
-        return	this.insertStmt.executeInsert();
-    }
-    public	void	deleteAll()	{
-        this.db.delete(TABLE_NAME,	null,	null);
+    public	long rlInsert(String	name, double longitude, double latitude, String address)	{
+        this.rl_InsertStmt.bindString(1,	name);
+        this.rl_InsertStmt.bindDouble(2, longitude);
+        this.rl_InsertStmt.bindDouble(3, latitude);
+        this.rl_InsertStmt.bindString(4,	address);
+        return	this.rl_InsertStmt.executeInsert();
     }
 
-    public	ArrayList<Destination>	selectAll()	{
+    public	long favInsert(String	name, double longitude, double latitude, String address)	{
+        this.fav_InsertStmt.bindString(1,	name);
+        this.fav_InsertStmt.bindDouble(2, longitude);
+        this.fav_InsertStmt.bindDouble(3, latitude);
+        this.fav_InsertStmt.bindString(4,	address);
+        return	this.fav_InsertStmt.executeInsert();
+    }
+    public	void	rlDeleteAll()	{
+        this.db.delete(RL_TABLE_NAME,	null,	null);
+    }
+    public	void	favDeleteAll()	{
+        this.db.delete(FAV_TABLE_NAME,	null,	null);
+    }
+
+    public	ArrayList<Destination>	rlSelectAll()	{
         ArrayList<Destination> list	=	new ArrayList<Destination>();
         Cursor cursor	=
-                this.db.query(TABLE_NAME,
+                this.db.query(RL_TABLE_NAME,
+                        new	String[]	{	"name",	"longitude","latitude","address"	},
+                        null,
+                        null,	null,	null,	null);
+        if	(cursor.moveToFirst())	do	{
+            String tempName = cursor.getString(0);
+            Double tempLong = cursor.getDouble(1);
+            Double tempLat = cursor.getDouble(2);
+            String tempAddress = cursor.getString(3);
+            Destination tempDest = new Destination(tempName, tempLong, tempLat);
+            tempDest.address = tempAddress;
+            list.add(tempDest);
+        }	while	(cursor.moveToNext());
+        if	(cursor	!=	null	&&	!cursor.isClosed())	{
+            cursor.close();
+        }
+        return	list;
+    }
+
+    public	ArrayList<Destination>	favSelectAll()	{
+        ArrayList<Destination> list	=	new ArrayList<Destination>();
+        Cursor cursor	=
+                this.db.query(FAV_TABLE_NAME,
                         new	String[]	{	"name",	"longitude","latitude","address"	},
                         null,
                         null,	null,	null,	null);
@@ -73,13 +111,16 @@ public class DatabaseHelper {
         }
         @Override
         public	void	onCreate(SQLiteDatabase db)	{
-            db.execSQL("CREATE	TABLE	"	+	TABLE_NAME	+
+            db.execSQL("CREATE	TABLE	"	+	RL_TABLE_NAME	+
+                    "(id	INTEGER	PRIMARY	KEY,	name	TEXT,	longitude REAL, latitude, REAL, address	TEXT)");
+            db.execSQL("CREATE	TABLE	"	+	FAV_TABLE_NAME	+
                     "(id	INTEGER	PRIMARY	KEY,	name	TEXT,	longitude REAL, latitude, REAL, address	TEXT)");
         }
         @Override
         public	void	onUpgrade(SQLiteDatabase db,	int oldVersion,	int newVersion)	{
             Log.w("Example", "Upgrading	database;	this	drops	&	recreates	tables.");
-            db.execSQL("DROP	TABLE	IF	EXISTS	"	+	TABLE_NAME);
+            db.execSQL("DROP	TABLE	IF	EXISTS	"	+	RL_TABLE_NAME);
+            db.execSQL("DROP	TABLE	IF	EXISTS	"	+	FAV_TABLE_NAME);
             onCreate(db);
         }
 

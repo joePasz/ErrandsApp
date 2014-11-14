@@ -3,6 +3,7 @@ package errandsapp.errandsapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,6 +29,7 @@ public class MainScreen extends Activity implements LocationListener {
 //    private Destination[] destinations;
     private ArrayList<Destination> destinations;
     private ArrayList<Destination> recentDestinations;
+    private ArrayList<Destination> favoriteDestinations;
     private Button searchButton;
     private Button addCurrentLocationButton;
     private Button buildRouteButton;
@@ -59,6 +61,7 @@ public class MainScreen extends Activity implements LocationListener {
         setContentView(R.layout.activity_main_screen);
 
         recentDestinations = new ArrayList<Destination>();
+        favoriteDestinations = new ArrayList<Destination>();
 
         dbHelper = new DatabaseHelper(getApplicationContext());
 
@@ -114,13 +117,9 @@ public class MainScreen extends Activity implements LocationListener {
         addCurrentLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
-                //destinations.add(dest);
+                Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
+                destinations.add(dest);
                 //rebuild table
-                //buildTable();
-
-                ArrayList<Destination> tempDests = dbHelper.selectAll();
-                destinations = tempDests;
                 buildTable();
             }
 
@@ -197,6 +196,13 @@ public class MainScreen extends Activity implements LocationListener {
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
                     ((Button)longClickView.findViewById(R.id.delete)).setTag(tag);
+                    ((Button)longClickView.findViewById(R.id.favorite)).setTag(tag);
+                    int favLoc = locationOfFavorite(destinations.get(tag));
+                    if(favLoc == -1) {
+                        ((Button)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.GRAY);
+                    } else {
+                        ((Button)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.YELLOW);
+                    }
                     longClickView.setMinimumHeight(height);
                     tempTable.removeView(arg0);
                     tempTable.addView(longClickView, index);
@@ -226,8 +232,9 @@ public class MainScreen extends Activity implements LocationListener {
 
     protected void onResume() {
         super.onResume();
-        ArrayList<Destination> tempDests = dbHelper.selectAll();
+        ArrayList<Destination> tempDests = dbHelper.rlSelectAll();
         recentDestinations = tempDests;
+        favoriteDestinations = dbHelper.favSelectAll();
         if(destinations.size() > 0){
             buildTable();
         }
@@ -272,6 +279,9 @@ public class MainScreen extends Activity implements LocationListener {
         } else if (id == R.id.action_recent) {
             clickRecent();
             return true;
+        } else if (id == R.id.action_favorites) {
+            clickFavorites();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -293,6 +303,21 @@ public class MainScreen extends Activity implements LocationListener {
             destinations.remove(cellNumber);
         }
         buildTable();
+    }
+
+    public void favoriteClick(View v){
+        int cellNumber = (Integer)v.getTag();
+        if (cellNumber != -1) {
+            Destination tempFavDest = destinations.get(cellNumber);
+            int favLoc = locationOfFavorite(tempFavDest);
+            if(favLoc == -1){
+                addFavoriteDestination(tempFavDest);
+                v.setBackgroundColor(Color.YELLOW);
+            } else {
+                removeFavoriteDestination(tempFavDest, favLoc);
+                v.setBackgroundColor(Color.GRAY);
+            }
+        }
     }
 
     public void cancelClick(View v){
@@ -321,15 +346,21 @@ public class MainScreen extends Activity implements LocationListener {
                 }
                 break;
             }
+
         }
     }
 
     public void buildTestData() {
         Destination tempDist1= new Destination("The Ohio State University - Dreese Laboratories", -83.015941, 40.002357);
+        tempDist1.address = "test address";
         Destination tempDist2= new Destination("Raising Cane's", -83.007699, 39.999338);
+        tempDist2.address = "test address";
         Destination tempDist3= new Destination("Chipotle Mexican Grill",-83.007168, 39.997513);
+        tempDist3.address = "test address";
         Destination tempDist4= new Destination("Lazenby Hall",-83.015635, 39.998839);
+        tempDist4.address = "test address";
         Destination tempDist5= new Destination("Caffe Apropos",-83.017099, 39.983966);
+        tempDist5.address = "test address";
 
 
         destinations.add(tempDist1);
@@ -367,7 +398,13 @@ public class MainScreen extends Activity implements LocationListener {
     public void clickRecent(){
         Intent intent = new Intent(getApplicationContext(), Recent.class);
         //starts the search activity with an id of 0
-        startActivity(intent);
+        startActivityForResult(intent, 0);
+    }
+
+    public void clickFavorites(){
+        Intent intent = new Intent(getApplicationContext(), Favorites.class);
+        //starts the search activity with an id of 0
+        startActivityForResult(intent,0);
     }
 
     /**
@@ -404,23 +441,56 @@ public class MainScreen extends Activity implements LocationListener {
 
     public void addRecentDestination(Destination destination) {
         recentDestinations.add(0, destination);
-        if(recentDestinations.size() > 4) {
+        if(recentDestinations.size() > 10) {
             recentDestinations.remove(recentDestinations.size()-1);
         }
-        dbHelper.deleteAll();
+        dbHelper.rlDeleteAll();
         for(int i = 0; i < recentDestinations.size(); i++) {
             Destination rDest = recentDestinations.get(i);
-            dbHelper.insert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
+            dbHelper.rlInsert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
         }
     }
+
+    public void addFavoriteDestination(Destination destination) {
+        favoriteDestinations.add(0, destination);
+        dbHelper.favDeleteAll();
+        for(int i = 0; i < favoriteDestinations.size(); i++) {
+            Destination fDest = favoriteDestinations.get(i);
+            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+        }
+    }
+
+    public void removeFavoriteDestination(Destination destination, int location) {
+        favoriteDestinations.remove(location);
+        dbHelper.favDeleteAll();
+        for(int i = 0; i < favoriteDestinations.size(); i++) {
+            Destination fDest = favoriteDestinations.get(i);
+            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+        }
+    }
+
+    public int locationOfFavorite(Destination favDest) {
+        for(int i = 0; i < favoriteDestinations.size(); i++) {
+            if(favDest.equals(favoriteDestinations.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 
     protected	void	onSaveInstanceState	(Bundle	outState){
         super.onSaveInstanceState(outState);
         Log.e(TAG, "++ SAVING!!! ++");
-        dbHelper.deleteAll();
+        dbHelper.rlDeleteAll();
         for(int i = 0; i < recentDestinations.size(); i++) {
             Destination rDest = recentDestinations.get(i);
-            dbHelper.insert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
+            dbHelper.rlInsert(rDest.name, rDest.longitude, rDest.latitude, rDest.address);
+        }
+        dbHelper.favDeleteAll();
+        for(int i = 0; i < favoriteDestinations.size(); i++) {
+            Destination fDest = favoriteDestinations.get(i);
+            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
         }
 
     }

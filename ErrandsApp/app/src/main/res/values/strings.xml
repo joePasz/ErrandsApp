@@ -8,7 +8,9 @@
     <string name="title_activity_build_route">BuildRoute</string>
     <string name="start_button">Start</string>
     <string name="end_button">End</string>
+    <string name="delete_button">Delete</string>
     <string name="destination_header">Destination</string>
     <string name="title_activity_recent">Recent</string>
+    <string name="title_activity_favorites">Favorites</string>
 
 </resources>
