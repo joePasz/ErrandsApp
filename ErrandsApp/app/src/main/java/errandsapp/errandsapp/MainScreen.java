@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -195,13 +196,14 @@ public class MainScreen extends Activity implements LocationListener {
                     int tag = (Integer)arg0.getTag();
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
-                    ((Button)longClickView.findViewById(R.id.delete)).setTag(tag);
-                    ((Button)longClickView.findViewById(R.id.favorite)).setTag(tag);
+
+                    ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
+                    ((ImageButton)longClickView.findViewById(R.id.favorite)).setTag(tag);
                     int favLoc = locationOfFavorite(destinations.get(tag));
                     if(favLoc == -1) {
-                        ((Button)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.GRAY);
+                        ((ImageButton)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.GRAY);
                     } else {
-                        ((Button)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.YELLOW);
+                        ((ImageButton)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.YELLOW);
                     }
                     longClickView.setMinimumHeight(height);
                     tempTable.removeView(arg0);
