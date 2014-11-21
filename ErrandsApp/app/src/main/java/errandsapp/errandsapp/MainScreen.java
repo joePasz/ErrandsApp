@@ -31,8 +31,8 @@ public class MainScreen extends Activity implements LocationListener {
     private ArrayList<Destination> destinations;
     private ArrayList<Destination> recentDestinations;
     private ArrayList<Destination> favoriteDestinations;
-    private Button searchButton;
-    private Button addCurrentLocationButton;
+    private ImageButton searchButton;
+    private ImageButton addCurrentLocationButton;
     private Button buildRouteButton;
     private Button deleteDestButton;
     private Button favoriteDestButton;
@@ -104,7 +104,7 @@ public class MainScreen extends Activity implements LocationListener {
         table.bringToFront();
         buildTable();
 
-        searchButton = (Button) findViewById(R.id.searchButton);
+        searchButton = (ImageButton) findViewById(R.id.searchButton);
         searchButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,7 +114,7 @@ public class MainScreen extends Activity implements LocationListener {
             }
 
         });
-        addCurrentLocationButton = (Button) findViewById(R.id.addCurrentLocationButton);
+        addCurrentLocationButton = (ImageButton) findViewById(R.id.addCurrentLocationButton);
         addCurrentLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -19,7 +19,7 @@
             <!--Layout for the Destination and the Address -->
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_weight="5"
+                android:layout_weight="3"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content">
                 <TextView
@@ -51,8 +51,8 @@
                 android:layout_weight="1">
 
 
-                <Button android:id="@+id/delete_Button"
-                    android:text="@string/delete_button"
+                <ImageButton android:id="@+id/delete_Button"
+                    android:src="@drawable/ic_action_discard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

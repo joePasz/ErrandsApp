@@ -18,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -39,7 +40,7 @@ public class Search extends Activity implements LocationListener{
 
     private TextView info;
     private EditText input;
-    private Button goSearch;
+    private ImageButton goSearch;
     private ArrayList<Destination> destinations;
     private TableLayout table;
     private LocationManager locationManager;
@@ -92,7 +93,7 @@ public class Search extends Activity implements LocationListener{
 
         info = (TextView) findViewById(R.id.searchBarResult);
         input = (EditText)findViewById(R.id.searchBar);
-        goSearch = (Button) findViewById(R.id.searchButton);
+        goSearch = (ImageButton) findViewById(R.id.searchButton);
         goSearch.setOnClickListener(new OnClickListener() {
 
             @Override
