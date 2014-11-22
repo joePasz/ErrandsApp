@@ -166,6 +166,14 @@ public class MainScreen extends Activity implements LocationListener {
     //This first removes all views within the table if there are any, then builds
     //it from scratch based on the contents of the Array List Destinations
     public boolean buildTable() {
+        Button tempBuildRouteButton = (Button) findViewById(R.id.buildRouteButton);
+        if(destinations.size()>2) {
+            tempBuildRouteButton.setEnabled(true);
+        } else {
+            tempBuildRouteButton.setEnabled(false);
+        }
+
+
         int count = table.getChildCount();
 //        table.removeAllViews();
         for (int i = count - 1; i >= 0; i--) {
