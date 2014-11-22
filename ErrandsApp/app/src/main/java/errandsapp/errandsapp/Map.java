@@ -62,22 +62,40 @@ public class Map extends FragmentActivity {
             orderedDestinations.add(tempDest);
         }
 
+        String polylineEncodedString = intent.getStringExtra("polyString");
+        ArrayList<LatLng> routeLatLongs = decodePoly(polylineEncodedString);
+
+
         PolylineOptions rectOptions = new PolylineOptions();
-        for(int i = 0; i < stepCoordinates.size(); i++) {
-            rectOptions.add(stepCoordinates.get(i));
+//        for(int i = 0; i < stepCoordinates.size(); i++) {
+//            rectOptions.add(stepCoordinates.get(i));
+//        }
+        for(int i = 0; i < routeLatLongs.size(); i++) {
+            rectOptions.add(routeLatLongs.get(i));
         }
 
        Polyline polyline = googleMap.addPolyline(rectOptions);
 
+        boolean beginAndEndIsEqual = false;
+        if(orderedDestinations.get(0).equals(orderedDestinations.get(orderedDestinations.size()-1))){
+            beginAndEndIsEqual = true;
+        }
+
         for(int i = 0; i < orderedDestinations.size(); i++) {
+
             Destination tempDest = orderedDestinations.get(i);
             MarkerOptions marker = new MarkerOptions()
                     .position(new LatLng(tempDest.latitude, tempDest.longitude))
                     .title((i+1) + ". " + tempDest.name);
             if(i == 0) {
+                if(beginAndEndIsEqual) {
+                    marker.title((i+1) + ". " + tempDest.name + " (Begin and Ending)");
+                }
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             } else if (i == orderedDestinations.size()-1) {
-                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                if(!beginAndEndIsEqual) {
+                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                }
             } else {
                 marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
@@ -85,7 +103,7 @@ public class Map extends FragmentActivity {
         }
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (LatLng coordinate : stepCoordinates) {
+        for (LatLng coordinate : routeLatLongs) {
             builder.include(coordinate);
         }
         LatLngBounds bounds = builder.build();
@@ -122,12 +140,50 @@ public class Map extends FragmentActivity {
         }
     }
 
+    //Method found from the gentleman at
+    //http://stackoverflow.com/questions/15924834/decoding-polyline-with-new-google-maps-api
+    //Thank you good sir. You are doing gods work.
+    private ArrayList<LatLng> decodePoly(String encoded) {
 
+        Log.i("Location", "String received: "+encoded);
+        ArrayList<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
 
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
 
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
 
+            LatLng p = new LatLng((((double) lat / 1E5)),(((double) lng / 1E5)));
+            poly.add(p);
+        }
 
-
-
-
+        for(int i=0;i<poly.size();i++){
+            Log.i("Location", "Point sent: Latitude: "+poly.get(i).latitude+" Longitude: "+poly.get(i).longitude);
+        }
+        return poly;
     }
+
+
+
+
+
+
+
+}

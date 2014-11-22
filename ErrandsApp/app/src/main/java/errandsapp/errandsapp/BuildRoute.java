@@ -42,6 +42,7 @@ public class BuildRoute extends Activity {
     private ArrayList<String> listOfDestNames;
     private double[] listOfDestLong;
     private double[] listOfDestLat;
+    private String polylineEncodedString;
 
 
     private String displayUrl;
@@ -68,6 +69,7 @@ public class BuildRoute extends Activity {
         String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
         String originName;
         String deName;
+        polylineEncodedString = "";
 
 
 
@@ -159,6 +161,7 @@ public class BuildRoute extends Activity {
                 mapIntent.putExtra("dLong", destLongs);
                 mapIntent.putExtra("dLat", destLats);
                 mapIntent.putExtra("dName", destNames);
+                mapIntent.putExtra("polyString", polylineEncodedString);
                 startActivity(mapIntent);
             }
 
@@ -210,8 +213,10 @@ public class BuildRoute extends Activity {
                             //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
                             stepLocations.add(new LatLng((Double) location.get("lat"),(Double) location.get("lng")));
                             orderedDestinations.add(tempDest);
-
                         }
+                        JSONObject overviewPolylines = route
+                                .getJSONObject("overview_polyline");
+                        polylineEncodedString = overviewPolylines.getString("points");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
