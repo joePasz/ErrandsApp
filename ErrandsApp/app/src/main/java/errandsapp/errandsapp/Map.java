@@ -46,13 +46,13 @@ public class Map extends FragmentActivity {
         orderedDestinations = new ArrayList<Destination>();
 
         Intent intent = getIntent();
-        stepCoordinates = new ArrayList<LatLng>();
-        double[] stepLongs = intent.getDoubleArrayExtra("sLong");
-        double[] stepLats = intent.getDoubleArrayExtra("sLat");
-        for(int i = 0; i < stepLongs.length; i++){
-            LatLng tempLocation = new LatLng(stepLats[i], stepLongs[i]);
-            stepCoordinates.add(tempLocation);
-        }
+//        stepCoordinates = new ArrayList<LatLng>();
+//        double[] stepLongs = intent.getDoubleArrayExtra("sLong");
+//        double[] stepLats = intent.getDoubleArrayExtra("sLat");
+//        for(int i = 0; i < stepLongs.length; i++){
+//            LatLng tempLocation = new LatLng(stepLats[i], stepLongs[i]);
+//            stepCoordinates.add(tempLocation);
+//        }
 
         double[] destLongs = intent.getDoubleArrayExtra("dLong");
         double[] destLats = intent.getDoubleArrayExtra("dLat");

@@ -137,13 +137,13 @@ public class BuildRoute extends Activity {
             public void onClick(View v) {
                 Intent mapIntent = new Intent(getApplicationContext(), Map.class);
 
-                double[] stepLongs = new double[stepLocations.size()];
-                double[] stepLats = new double[stepLocations.size()];
-
-                for(int i=0; i<stepLocations.size(); i++){
-                    stepLongs[i] = stepLocations.get(i).longitude;
-                    stepLats[i] = stepLocations.get(i).latitude;
-                }
+//                double[] stepLongs = new double[stepLocations.size()];
+//                double[] stepLats = new double[stepLocations.size()];
+//
+//                for(int i=0; i<stepLocations.size(); i++){
+//                    stepLongs[i] = stepLocations.get(i).longitude;
+//                    stepLats[i] = stepLocations.get(i).latitude;
+//                }
 
                 ArrayList<String> destNames = new ArrayList<String>();
                 double[] destLongs = new double[orderedDestinations.size()];
@@ -156,8 +156,8 @@ public class BuildRoute extends Activity {
                     destLats[i] = tempDest.latitude;
                 }
 
-                mapIntent.putExtra("sLong", stepLongs);
-                mapIntent.putExtra("sLat", stepLats);
+//                mapIntent.putExtra("sLong", stepLongs);
+//                mapIntent.putExtra("sLat", stepLats);
                 mapIntent.putExtra("dLong", destLongs);
                 mapIntent.putExtra("dLat", destLats);
                 mapIntent.putExtra("dName", destNames);
@@ -188,35 +188,45 @@ public class BuildRoute extends Activity {
                         JSONObject dist;
                         Integer distance ;
                         stepLocations = new ArrayList<LatLng>();
-                        if(route.has("legs")) {
-                            legs = route.getJSONArray("legs");
-                            for(int i2 = 0; i2 < legs.length();i2++) {
-                                leg = legs.getJSONObject(i2);
-                                JSONObject location = (JSONObject) leg.get("start_location");
-                                Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
-                                orderedDestinations.add(tempDest);
-                            }
-                            for(int i2 = 0; i2 < legs.length();i2++) {
-                                leg = legs.getJSONObject(i2);
-                                if(leg.has("steps")) {
-                                    steps = leg.getJSONArray("steps");
-                                    for(int i3 = 0; i3 < steps.length();i3++) {
-                                        step = steps.getJSONObject(i3);
-                                        JSONObject stepLocation = (JSONObject) step.get("start_location");
-                                        stepLocations.add(new LatLng((Double) stepLocation.get("lat"),(Double) stepLocation.get("lng")));
-                                    }
-                                }
-                            }
-                            leg = legs.getJSONObject(legs.length()-1);
-                            JSONObject location = (JSONObject) leg.get("end_location");
-                            Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
-                            //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
-                            stepLocations.add(new LatLng((Double) location.get("lat"),(Double) location.get("lng")));
-                            orderedDestinations.add(tempDest);
-                        }
+//                        if(route.has("legs")) {
+//                            legs = route.getJSONArray("legs");
+//                            for(int i2 = 0; i2 < legs.length();i2++) {
+//                                leg = legs.getJSONObject(i2);
+//                                JSONObject location = (JSONObject) leg.get("start_location");
+//                                Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
+//                                orderedDestinations.add(tempDest);
+//                            }
+//                            for(int i2 = 0; i2 < legs.length();i2++) {
+//                                leg = legs.getJSONObject(i2);
+//                                if(leg.has("steps")) {
+//                                    steps = leg.getJSONArray("steps");
+//                                    for(int i3 = 0; i3 < steps.length();i3++) {
+//                                        step = steps.getJSONObject(i3);
+//                                        JSONObject stepLocation = (JSONObject) step.get("start_location");
+//                                        stepLocations.add(new LatLng((Double) stepLocation.get("lat"),(Double) stepLocation.get("lng")));
+//                                    }
+//                                }
+//                            }
+//                            leg = legs.getJSONObject(legs.length()-1);
+//                            JSONObject location = (JSONObject) leg.get("end_location");
+//                            Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
+//                            //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
+//                            stepLocations.add(new LatLng((Double) location.get("lat"),(Double) location.get("lng")));
+//                            orderedDestinations.add(tempDest);
+//                        }
                         JSONObject overviewPolylines = route
                                 .getJSONObject("overview_polyline");
                         polylineEncodedString = overviewPolylines.getString("points");
+                        if(route.has("waypoint_order")) {
+                            JSONArray waypoint_order = route.getJSONArray("waypoint_order");
+                            int[] order = new int[waypoint_order.length()];
+                            for(int i = 0; i < waypoint_order.length(); i++){
+                                order[i] = (Integer)waypoint_order.get(i);
+                            }
+                            orderedDestinations = calculateOrderedDestinations(order);
+                        } else {
+                            orderedDestinations = destinations;
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -341,6 +351,19 @@ public class BuildRoute extends Activity {
             }
         }
         return destinations.get(lowestIndex);
+    }
+
+    public ArrayList<Destination> calculateOrderedDestinations(int[] waypointOrder) {
+        ArrayList<Destination> orderedDestinations = new ArrayList<Destination>();
+        orderedDestinations.add(destinations.get(0));
+
+        for(int i = 0; i < waypointOrder.length; i++){
+            orderedDestinations.add(destinations.get(waypointOrder[i]+1));
+        }
+
+        orderedDestinations.add(destinations.get(destinations.size()-1));
+
+        return orderedDestinations;
     }
 
     public static double findDistance(double long1, double long2, double lat1, double lat2) {
