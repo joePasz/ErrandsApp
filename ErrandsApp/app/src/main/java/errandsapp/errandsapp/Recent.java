@@ -112,7 +112,8 @@ public class Recent extends Activity {
     protected	void	onRestoreInstanceState	(Bundle	savedInstanceState)	{
         super.onRestoreInstanceState(savedInstanceState);
 
-
     }
+
+
 
 }

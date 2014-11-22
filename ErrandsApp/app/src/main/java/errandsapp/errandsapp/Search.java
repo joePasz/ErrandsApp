@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
@@ -262,8 +261,7 @@ public class Search extends Activity implements LocationListener{
     //Following are location methods!!
     @Override
     public void onLocationChanged(Location location) {
-
-
+        locationManager.removeUpdates(this);
     }
 
     @Override

@@ -349,8 +349,12 @@ public class MainScreen extends Activity implements LocationListener {
                     double newLat = data.getDoubleExtra("dLat",0.0);
                     Destination dest = new Destination(newText,newLong,newLat);
                     dest.address = data.getStringExtra("dAddress");
-                    destinations.add(dest);
-                    addRecentDestination(dest);
+                    if(!checkRepeatedDestination(dest)){
+                        destinations.add(dest);
+                    }
+                    if(!checkRepeatedRecentDestination(dest)) {
+                        addRecentDestination(dest);
+                    }
                     //rebuild table
                     buildTable();
                 }
@@ -576,6 +580,24 @@ public class MainScreen extends Activity implements LocationListener {
             };
         }
 
+    }
+
+    public boolean checkRepeatedDestination(Destination tempDest) {
+        for(int i = 0; i < destinations.size(); i++) {
+            if (tempDest.equals(destinations.get(i))){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkRepeatedRecentDestination(Destination tempDest) {
+        for(int i = 0; i < recentDestinations.size(); i++) {
+            if (tempDest.equals(recentDestinations.get(i))){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
