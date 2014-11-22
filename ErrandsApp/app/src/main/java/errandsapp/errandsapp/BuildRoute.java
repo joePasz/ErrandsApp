@@ -1,7 +1,10 @@
 package errandsapp.errandsapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,6 +46,7 @@ public class BuildRoute extends Activity {
     private double[] listOfDestLong;
     private double[] listOfDestLat;
     private String polylineEncodedString;
+    ProgressDialog indicator;
 
 
     private String displayUrl;
@@ -52,7 +56,21 @@ public class BuildRoute extends Activity {
         public void handleMessage(Message msg) {
             switch(msg.what){
                 case 0:
+                    indicator.dismiss();
                     buildTable();
+                    break;
+                case 1:
+                    indicator.dismiss();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(BuildRoute.this);
+                    builder.setMessage("Building Route Failed! (Possible Network Issues)")
+                            .setCancelable(false)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    BuildRoute.this.finish();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
                     break;
             }
         }
@@ -70,6 +88,18 @@ public class BuildRoute extends Activity {
         String originName;
         String deName;
         polylineEncodedString = "";
+        indicator = new ProgressDialog(this);
+        indicator.setMessage("Building Optimized Route");
+        indicator.setCancelable(false);
+
+        indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                BuildRoute.this.finish();
+            }
+        });
+        indicator.show();
 
 
 
@@ -170,7 +200,10 @@ public class BuildRoute extends Activity {
         Log.e(TAG, displayUrl);
         if(displayUrl != null) {
             new Thread(new Runnable(){
+                ProgressDialog progressDialog;
                 public void run(){
+
+
                     String URLString = displayUrl;
                     String searchResultString = getUrlContents(URLString);
 
@@ -227,17 +260,35 @@ public class BuildRoute extends Activity {
                         } else {
                             orderedDestinations = destinations;
                         }
+                        Message msg = Message.obtain();
+                        msg.what = 0;
+                        handler.sendMessage(msg);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Message msg = Message.obtain();
+                        msg.what = 1;
+                        handler.sendMessage(msg);
                     }
-                    Message msg = Message.obtain();
-                    msg.what = 0;
-                    handler.sendMessage(msg);
+
 
                 }
 
-//                protected void onPostExecute() {
-//                    buildTable();
+////                @Override
+//                protected void onPostExecute(String result) {
+//                    if (progressDialog.isShowing()) {
+//                        progressDialog.dismiss();
+//                    }
+//                }
+//
+////                @Override
+//                protected void onPreExecute() {
+//                    if (progressDialog == null) {
+//                        progressDialog = new ProgressDialog(BuildRoute.this);
+//                        progressDialog.setMessage("Synchronizing, please wait...");
+//                        progressDialog.show();
+//                        progressDialog.setCanceledOnTouchOutside(false);
+//                        progressDialog.setCancelable(false);
+//                    }
 //                }
             }).start();
         }
