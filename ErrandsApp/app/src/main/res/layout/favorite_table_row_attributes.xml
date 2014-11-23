@@ -58,7 +58,7 @@
                     android:layout_weight="1"
                     android:textSize="8dp"
                     android:layout_gravity="center"
-                    android:background="#FF0000"
+                    android:background="@null"
                     android:padding="3dp"
                     android:layout_margin="5dp"
                     android:onClick="deleteClicked"

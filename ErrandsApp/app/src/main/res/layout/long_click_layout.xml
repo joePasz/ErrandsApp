@@ -26,6 +26,7 @@
         android:clickable="true"
         android:onClick="cancelClick"
         android:layout_gravity="center_vertical"
+        android:background="@null"
         />
     <ImageButton
         android:id="@+id/favorite"
@@ -37,6 +38,7 @@
         android:onClick="favoriteClick"
         android:padding="5dp"
         android:layout_gravity="center_vertical"
+        android:background="@null"
         />
     <ImageButton
         android:id="@+id/delete"
@@ -48,6 +50,7 @@
         android:clickable="true"
         android:onClick="deleteClick"
         android:layout_gravity="center_vertical"
+        android:background="@null"
         />
     </LinearLayout>
     <View

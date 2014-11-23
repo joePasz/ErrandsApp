@@ -206,12 +206,15 @@ public class MainScreen extends Activity implements LocationListener {
                     int index = tempTable.indexOfChild(arg0);
 
                     ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
-                    ((ImageButton)longClickView.findViewById(R.id.favorite)).setTag(tag);
+                    ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
+                    deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
+                    ImageButton favButton = ((ImageButton)longClickView.findViewById(R.id.favorite));
+                    favButton.setTag(tag);
                     int favLoc = locationOfFavorite(destinations.get(tag));
                     if(favLoc == -1) {
-                        ((ImageButton)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.GRAY);
+                        favButton.setColorFilter(Color.argb(0, 255,255,255)); // White Tint
                     } else {
-                        ((ImageButton)longClickView.findViewById(R.id.favorite)).setBackgroundColor(Color.YELLOW);
+                        favButton.setColorFilter(Color.argb(255, 255,255,0)); // White Tint
                     }
                     longClickView.setMinimumHeight(height);
                     tempTable.removeView(arg0);
@@ -320,12 +323,13 @@ public class MainScreen extends Activity implements LocationListener {
         if (cellNumber != -1) {
             Destination tempFavDest = destinations.get(cellNumber);
             int favLoc = locationOfFavorite(tempFavDest);
+            ImageButton imageView = (ImageButton)v;
             if(favLoc == -1){
                 addFavoriteDestination(tempFavDest);
-                v.setBackgroundColor(Color.YELLOW);
+                imageView.setColorFilter(Color.argb(255, 255,255,0)); // White Tint
             } else {
                 removeFavoriteDestination(tempFavDest, favLoc);
-                v.setBackgroundColor(Color.GRAY);
+                imageView.setColorFilter(Color.argb(0, 255,255,255)); // White Tint
             }
         }
     }
