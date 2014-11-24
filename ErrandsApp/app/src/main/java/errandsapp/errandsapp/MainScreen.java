@@ -220,9 +220,7 @@ public class MainScreen extends Activity implements LocationListener {
                 public boolean onLongClick(View arg0) {
 //                    arg0.setBackgroundColor(Color.rgb(226, 11, 11));
                     TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
-//                    ((TextView)longClickView.findViewById(R.id.column_1)).setText("TEST");
                     int height =  arg0.getHeight();
-
                     int tag = (Integer)arg0.getTag();
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
