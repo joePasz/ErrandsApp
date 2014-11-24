@@ -149,7 +149,7 @@ public class Search extends Activity implements LocationListener{
         destinations.clear();
         buildTable();
         indicator = new ProgressDialog(this);
-        indicator.setMessage("Searching...");
+        indicator.setMessage("Searching \"" + input.getText().toString() + "\"...");
         indicator.setCancelable(false);
 
         indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
@@ -210,12 +210,6 @@ public class Search extends Activity implements LocationListener{
             View child = table.getChildAt(i);
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
         }
-
-        //builds a header row, ugly, but proof of concept
-//        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-//        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
-//        header.setTag(-1);
-//        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the table_row_attributes.xml file
@@ -325,6 +319,7 @@ public class Search extends Activity implements LocationListener{
     //Following are location methods!!
     @Override
     public void onLocationChanged(Location location) {
+        //Should stop updating location once it has been found once.
         locationManager.removeUpdates(this);
     }
 
@@ -344,19 +339,3 @@ public class Search extends Activity implements LocationListener{
     }
 
 }
-
-//class DownloadImageTask extends AsyncTask {
-//    public int doInBackground(String... urls) {
-//        int i = 10;
-//        return 1;
-//    }
-//
-//    protected void onPostExecute() {
-//            buildTable();
-//    }
-//
-//    @Override
-//    protected Object doInBackground(Object[] objects) {
-//        return null;
-//    }
-//}
