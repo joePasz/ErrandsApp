@@ -293,6 +293,7 @@ public class Search extends Activity implements LocationListener{
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        //Fixes the Up Button
         if(id == android.R.id.home) {
             Search.this.finish();
             return true;

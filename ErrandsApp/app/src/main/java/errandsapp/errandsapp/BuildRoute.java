@@ -20,8 +20,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,37 +33,35 @@ import java.util.ArrayList;
 
 public class BuildRoute extends Activity {
 
-    private ArrayList<Destination> destinations;
-    private ArrayList<Destination> orderedDestinations;
+    private ArrayList<Destination> destinations; //represents the destinations received
+    private ArrayList<Destination> orderedDestinations; //represents the optimized order, respecting the beginning and ending
     private TableLayout table;
     LayoutInflater inflater;
-    private ArrayList<LatLng> stepLocations;
-    private Button buildMapButton;
-
-    private ArrayList<String> listOfDestNames;
-    private double[] listOfDestLong;
-    private double[] listOfDestLat;
+    //polylineEncodedString is an encoded string the coorelates to how to plot the route on a google map
     private String polylineEncodedString;
     ProgressDialog indicator;
+    private String directionsRequestUrl;
 
-
-    private String displayUrl;
-//    private TextView textView;
+    //This handler is passed messages at the end of the html request thread
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what){
                 case 0:
+                    //This is called when the request is successful
                     indicator.dismiss();
                     buildTable();
                     break;
                 case 1:
+                    //This is called when the request failed
                     indicator.dismiss();
+                    //builds alert to warn user
                     AlertDialog.Builder builder = new AlertDialog.Builder(BuildRoute.this);
                     builder.setMessage("Building Route Failed! (Possible Network Issues)")
                             .setCancelable(false)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    //kills the buildRoute once accepted
                                     BuildRoute.this.finish();
                                 }
                             });
@@ -75,8 +71,6 @@ public class BuildRoute extends Activity {
             }
         }
     };
-
-
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
     @Override
@@ -84,14 +78,19 @@ public class BuildRoute extends Activity {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_build_route);
-        String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-        String originName;
-        String deName;
+
+        //initialize global variables
+        destinations = new ArrayList<Destination>();
+        orderedDestinations = new ArrayList<Destination>();
         polylineEncodedString = "";
+        inflater = (LayoutInflater)this.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+        table = (TableLayout)findViewById(R.id.table);
+        table.bringToFront();
+        //creates and starts the ProgressDialog to inform the user it is building the optimized route
         indicator = new ProgressDialog(this);
         indicator.setMessage("Building Optimized Route");
         indicator.setCancelable(false);
-
         indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -101,79 +100,71 @@ public class BuildRoute extends Activity {
         });
         indicator.show();
 
+        //Rebuilds the destinations array from the intent, and then uses this to build the requestURL
+        buildDestinationsFromIntent();
+        directionsRequestUrl = buildGoogleDirectionsRequest();
 
+        //initilize the build map button
+        initializeBuildMapButton();
 
-        listOfDestNames = new ArrayList<String>();
-        destinations = new ArrayList<Destination>();
-        orderedDestinations = new ArrayList<Destination>();
+        //Finally runs the directions request which uses the url build earlier
+        runGoogleDirectionsQuery();
+    }
 
-//        textView = (TextView)findViewById(R.id.Url);
-
+    /*
+    This method takes the intent and rebuilds the destinations array from the contents of the intent
+     */
+    public void buildDestinationsFromIntent() {
         Intent intent = getIntent();
-        listOfDestNames = intent.getStringArrayListExtra("dName");
+        ArrayList<String> listOfDestNames = intent.getStringArrayListExtra("dName");
+        double[] listOfDestLong = intent.getDoubleArrayExtra("dLong");
+        double[] listOfDestLat = intent.getDoubleArrayExtra("dLat");
 
-        int size = listOfDestNames.size();
-        int lastIndex = size - 1;
-
-
-        listOfDestLong = new double[size];
-        listOfDestLat = new double[size];
-
-        listOfDestLong = intent.getDoubleArrayExtra("dLong");
-        listOfDestLat = intent.getDoubleArrayExtra("dLat");
-
-
-
-        for(int i=0; i <size; i++){
-            String destName;
-            Double destLong;
-            Double destLat;
-            destName = listOfDestNames.get(i);
-            destLong = listOfDestLong[i];
-            destLat = listOfDestLat[i];
-            Destination des = new Destination(destName, destLong, destLat);
-
+        for(int i=0; i < listOfDestNames.size(); i++){
+            Destination des = new Destination(listOfDestNames.get(i), listOfDestLong[i], listOfDestLat[i]);
             destinations.add(i, des);
-
         }
+    }
 
-        originName = destinations.get(0).latitude + "," + destinations.get(0).longitude;
-        deName = destinations.get(lastIndex).latitude + "," + destinations.get(lastIndex).longitude;
+    /*
+    This method takes the contents of the destinations arraylist and returns the google directions http
+    request.
+     */
+    public String buildGoogleDirectionsRequest(){
+        String originName = destinations.get(0).latitude + "," + destinations.get(0).longitude;
+        String deName = destinations.get(destinations.size()-1).latitude + "," + destinations.get(destinations.size()-1).longitude;
+        String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
 
-
-        for(int i=1; i<lastIndex; i++){
+        //Adds each destination as a waypoint in the request
+        for(int i=1; i<destinations.size()-1; i++){
             if(i==1){
                 urlString = urlString + originName + "&destination=" + deName + "&waypoints=optimize:true|";
             }
             String locString;
             locString = destinations.get(i).latitude + "," + destinations.get(i).longitude;
 
-            if(i == (lastIndex-1)){
+            if(i == (destinations.size()-2)){
                 urlString = urlString + locString;
             }
             else{
                 urlString = urlString + locString + "|";
             }
         }
-
         urlString = urlString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+        return urlString;
+    }
 
-        displayUrl = urlString;
-//        textView.setText(displayUrl);
-
-        buildMapButton = (Button) findViewById(R.id.buildMapButton);
+    /*
+    This takes the BuildMapButton and adds the onclick event
+    this even takes the orderedDestinations and the encondedPolySting and sends them
+    in the Map Intent
+     */
+    public void initializeBuildMapButton(){
+        Button buildMapButton = (Button) findViewById(R.id.buildMapButton);
         buildMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mapIntent = new Intent(getApplicationContext(), Map.class);
-
-//                double[] stepLongs = new double[stepLocations.size()];
-//                double[] stepLats = new double[stepLocations.size()];
-//
-//                for(int i=0; i<stepLocations.size(); i++){
-//                    stepLongs[i] = stepLocations.get(i).longitude;
-//                    stepLats[i] = stepLocations.get(i).latitude;
-//                }
 
                 ArrayList<String> destNames = new ArrayList<String>();
                 double[] destLongs = new double[orderedDestinations.size()];
@@ -185,9 +176,6 @@ public class BuildRoute extends Activity {
                     destLongs[i] = tempDest.longitude;
                     destLats[i] = tempDest.latitude;
                 }
-
-//                mapIntent.putExtra("sLong", stepLongs);
-//                mapIntent.putExtra("sLat", stepLats);
                 mapIntent.putExtra("dLong", destLongs);
                 mapIntent.putExtra("dLat", destLats);
                 mapIntent.putExtra("dName", destNames);
@@ -196,61 +184,33 @@ public class BuildRoute extends Activity {
             }
 
         });
+    }
 
-        Log.e(TAG, displayUrl);
-        if(displayUrl != null) {
+    /*
+    This takes the google directions request string and builds a thread which sends this request
+    and parses the response to build the new orderedDestinations arrayList
+     */
+    public void runGoogleDirectionsQuery(){
+        if(directionsRequestUrl != null) {
             new Thread(new Runnable(){
-                ProgressDialog progressDialog;
                 public void run(){
-
-
-                    String URLString = displayUrl;
-                    String searchResultString = getUrlContents(URLString);
-
-
-                    //This is the parsing code for Search, not Build Route, This will cause it to crash
-                    //We need to fix this parser for build route
+                    //Establishes URLConnections, sends the request, and receives the response as a string
+                    String searchResultString = getUrlContents(directionsRequestUrl);
                     try {
+                        //Turns the response to a JSON object
                         JSONObject directionsResultJSON = new JSONObject(searchResultString);
+
+                        //Parses the JSON object
                         JSONArray routesArray = directionsResultJSON.getJSONArray("routes");
                         JSONObject route = routesArray.getJSONObject(0);
-                        JSONArray legs ;
-                        JSONObject leg ;
-                        JSONArray steps ;
-                        JSONObject step ;
-                        JSONObject dist;
-                        Integer distance ;
-                        stepLocations = new ArrayList<LatLng>();
-//                        if(route.has("legs")) {
-//                            legs = route.getJSONArray("legs");
-//                            for(int i2 = 0; i2 < legs.length();i2++) {
-//                                leg = legs.getJSONObject(i2);
-//                                JSONObject location = (JSONObject) leg.get("start_location");
-//                                Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
-//                                orderedDestinations.add(tempDest);
-//                            }
-//                            for(int i2 = 0; i2 < legs.length();i2++) {
-//                                leg = legs.getJSONObject(i2);
-//                                if(leg.has("steps")) {
-//                                    steps = leg.getJSONArray("steps");
-//                                    for(int i3 = 0; i3 < steps.length();i3++) {
-//                                        step = steps.getJSONObject(i3);
-//                                        JSONObject stepLocation = (JSONObject) step.get("start_location");
-//                                        stepLocations.add(new LatLng((Double) stepLocation.get("lat"),(Double) stepLocation.get("lng")));
-//                                    }
-//                                }
-//                            }
-//                            leg = legs.getJSONObject(legs.length()-1);
-//                            JSONObject location = (JSONObject) leg.get("end_location");
-//                            Destination tempDest = destinationGivenLocation((Double) location.get("lat"),(Double) location.get("lng"));
-//                            //Destination tempDest = new Destination("test",(Double) location.get("lat"),(Double) location.get("lng"));
-//                            stepLocations.add(new LatLng((Double) location.get("lat"),(Double) location.get("lng")));
-//                            orderedDestinations.add(tempDest);
-//                        }
-                        JSONObject overviewPolylines = route
-                                .getJSONObject("overview_polyline");
+
+                        //Extract the encodedPolylineString
+                        JSONObject overviewPolylines = route.getJSONObject("overview_polyline");
                         polylineEncodedString = overviewPolylines.getString("points");
+
+                        //Extract the optimized order of the waypoints
                         if(route.has("waypoint_order")) {
+                            //uses this new order to build the orderedDestinations ArrayList
                             JSONArray waypoint_order = route.getJSONArray("waypoint_order");
                             int[] order = new int[waypoint_order.length()];
                             for(int i = 0; i < waypoint_order.length(); i++){
@@ -260,46 +220,24 @@ public class BuildRoute extends Activity {
                         } else {
                             orderedDestinations = destinations;
                         }
+
+                        //Inform the message handler that the request was a success
                         Message msg = Message.obtain();
                         msg.what = 0;
                         handler.sendMessage(msg);
                     } catch (JSONException e) {
+                        //error, probably network related
                         e.printStackTrace();
+                        //inform the message handler that the request was a failure
                         Message msg = Message.obtain();
                         msg.what = 1;
                         handler.sendMessage(msg);
                     }
-
-
                 }
-
-////                @Override
-//                protected void onPostExecute(String result) {
-//                    if (progressDialog.isShowing()) {
-//                        progressDialog.dismiss();
-//                    }
-//                }
-//
-////                @Override
-//                protected void onPreExecute() {
-//                    if (progressDialog == null) {
-//                        progressDialog = new ProgressDialog(BuildRoute.this);
-//                        progressDialog.setMessage("Synchronizing, please wait...");
-//                        progressDialog.show();
-//                        progressDialog.setCanceledOnTouchOutside(false);
-//                        progressDialog.setCancelable(false);
-//                    }
-//                }
             }).start();
         }
-
-        inflater = (LayoutInflater)this.getSystemService
-                (Context.LAYOUT_INFLATER_SERVICE);
-
-        table = (TableLayout)findViewById(R.id.table);
-        table.bringToFront();
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -344,31 +282,42 @@ public class BuildRoute extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        //Fixes the Up Button
         if(id == android.R.id.home) {
             BuildRoute.this.finish();
-            //NavUtils.navigateUpTo(this, new Intent(this, ItemListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+
+    /*
+    Wonderful method borrowed and modified from StackOverflow which takes a url, establish a connection
+    then reads the response and returns said response as a string
+     */
     private String getUrlContents(String theUrl) {
         StringBuilder content = new StringBuilder();
         try {
             URL url = new URL(theUrl);
             URLConnection urlConnection = url.openConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
+            //reads the response
+            BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 content.append(line + "\n");
             }
-            bufferedReader.close();
+            br.close();
         }catch (Exception e) {
+            //error occured, usually network related
             e.printStackTrace();
         }
         return content.toString();
     }
 
+    /*
+    Method that is called whenever the table needs to be refreshed
+    This table represents the results of the sorted directions query
+     */
     public boolean buildTable() {
         int count = table.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -376,54 +325,32 @@ public class BuildRoute extends Activity {
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
         }
 
-        //builds a header row, ugly, but proof of concept
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
-            // Inflates the table_row_attributes.xml file
-            // not sure what inflates does, but I think I am doing this right....
+            // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(orderedDestinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(orderedDestinations.get(i).address);
-            row.setTag(i);
             table.addView(row);
         }
         return true;
     }
 
-    public Destination destinationGivenLocation(double latitude, double longitude) {
-        int lowestIndex = 0;
-        double lowestAmount = 999999.0;
-        for(int i = 0; i < destinations.size(); i++) {
-            Destination tempDest = destinations.get(i);
-            double distance = findDistance(tempDest.longitude, longitude, tempDest.latitude, latitude);
-            //distance = Math.abs(distance);
-            if(distance < lowestAmount) {
-                lowestAmount = distance;
-                lowestIndex = i;
-            }
-        }
-        return destinations.get(lowestIndex);
-    }
 
+    /*
+    This takes an int[] and returns a sorted version of the destinations array using this information
+    the waypoint order will be in the form of [2,0,1]
+      This means the first waypoint is third in the new order, the second is first, and the final is second
+     */
     public ArrayList<Destination> calculateOrderedDestinations(int[] waypointOrder) {
         ArrayList<Destination> orderedDestinations = new ArrayList<Destination>();
         orderedDestinations.add(destinations.get(0));
-
         for(int i = 0; i < waypointOrder.length; i++){
             orderedDestinations.add(destinations.get(waypointOrder[i]+1));
         }
-
         orderedDestinations.add(destinations.get(destinations.size()-1));
-
         return orderedDestinations;
     }
 
-    public static double findDistance(double long1, double long2, double lat1, double lat2) {
-        return Math.sqrt(Math.pow(long2-long1,2.0)+Math.pow(lat2-lat1,2.0));
-    }
-
-    public void clickHandlerCell(View v){
-
-    }
 }
