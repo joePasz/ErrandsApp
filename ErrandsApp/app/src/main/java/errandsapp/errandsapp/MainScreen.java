@@ -20,6 +20,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -205,6 +206,12 @@ public class MainScreen extends Activity implements LocationListener {
             // Inflates the table_row_attributes.xml file
             // not sure what inflates does, but I think I am doing this right....
             TableRow row = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
+            int oriTest = getResources().getConfiguration().orientation;
+            if(getResources().getConfiguration().orientation == 2) {
+                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.text_layout));
+                ll.getLayoutParams().width = 1350;
+                ll.requestLayout();
+            }
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
