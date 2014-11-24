@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -30,32 +29,23 @@ import java.util.ArrayList;
 
 public class MainScreen extends Activity implements LocationListener {
 
-//    private Destination[] destinations;
+    //Current Destinations, all recent destinations, and all favorite destinatinos
     private ArrayList<Destination> destinations;
     private ArrayList<Destination> recentDestinations;
     private ArrayList<Destination> favoriteDestinations;
-    private ImageButton searchButton;
-    private ImageButton addCurrentLocationButton;
-    private Button buildRouteButton;
-    private Button deleteDestButton;
-    private Button favoriteDestButton;
-    private Button destStartButton;
-    private Button destEndButton;
 
+    //Used to keep track of which location has been selected to be start/end
     private Destination startLocation;
     private Destination endLocation;
 
+    //the database helped
     private DatabaseHelper dbHelper;
 
+    //Additional helpful global variables
     private TableLayout table;
     private LocationManager locationManager;
     private Location currentLocation;
     LayoutInflater inflater;
-
-    private ArrayList<String> listOfDestNames;
-    private double[] listOfDestLong;
-    private double[] listOfDestLat;
-
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
     @Override
@@ -64,51 +54,122 @@ public class MainScreen extends Activity implements LocationListener {
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_main_screen);
 
+        //initilize global variables
         recentDestinations = new ArrayList<Destination>();
         favoriteDestinations = new ArrayList<Destination>();
-
+        destinations = new ArrayList<Destination>();
         dbHelper = new DatabaseHelper(getApplicationContext());
-
-
-
         inflater = (LayoutInflater)this.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
 
-        //Just an ugly, quick, and dirty way to build an array of these destination object
-//        Destination dest = new Destination("Starbucks",32.04947,-40.2381);
-        destinations = new ArrayList<Destination>();
+        //builds test data
         buildTestData();
-//        for(int i = 0; i < 5; i++){
-//            destinations.add(dest);
-//        }
 
-        //build main table
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isWifiEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if(locationManager != null && isGPSEnabled) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
-            }
-        } else if(locationManager != null && isWifiEnabled) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-            currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
-            }
-        }
-
+        //Sets location abilities up
+        establishLocation();
 
 
         table = (TableLayout)findViewById(R.id.table);
         table.bringToFront();
         buildTable();
 
-        searchButton = (ImageButton) findViewById(R.id.searchButton);
-        searchButton.setOnClickListener(new OnClickListener() {
+        //establishes onClickListeners for each button
+        initializeButtons();
+    }
+
+    /*
+    This is the large method in charge of updating the table and buttons to reflect the current
+      state of the backend.
+    So this first initializes the table, then it is called whenever destinations are added/removed
+     */
+    public boolean buildTable() {
+        //This first enables or disables the build route if there is enough destinations in list
+        Button tempBuildRouteButton = (Button) findViewById(R.id.buildRouteButton);
+        if(destinations.size()>2) {
+            tempBuildRouteButton.setEnabled(true);
+        } else {
+            tempBuildRouteButton.setEnabled(false);
+        }
+
+        //This removes all the current rows of the table
+        int count = table.getChildCount();
+        for (int i = count - 1; i >= 0; i--) {
+            View child = table.getChildAt(i);
+
+            if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
+            if (child instanceof TableRow) table.removeView(child);
+        }
+
+        //Dynamically adds rows based on the size of the destinations array
+        for(int i = 0; i < destinations.size(); i++){
+            // Inflates the table_row_attributes.xml file
+            TableRow row = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
+
+            //Finds oritentation and alters the row width if in landscape
+            if(getResources().getConfiguration().orientation == 2) {
+                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.text_layout));
+                ll.getLayoutParams().width = 1350;
+                ll.requestLayout();
+            }
+            //Sets the tags for each button(start and end) and their default colors
+            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
+            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
+            ImageButton startButton = (ImageButton)row.findViewById(R.id.start_button);
+            startButton.setTag(i);
+            startButton.setColorFilter(Color.argb(255, 150,200,150));
+            ImageButton endButton = (ImageButton)row.findViewById(R.id.end_Button);
+            endButton.setTag(i);
+            endButton.setColorFilter(Color.argb(255, 200,150,150));
+            row.setTag(i);
+
+            //sets the longClickListener for each row
+            row.setOnLongClickListener(new View.OnLongClickListener() {
+                public boolean onLongClick(View arg0) {
+                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
+                    int height =  arg0.getHeight();
+                    int tag = (Integer)arg0.getTag();
+                    ViewGroup tempTable = (ViewGroup)arg0.getParent();
+                    int index = tempTable.indexOfChild(arg0);
+
+                    ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
+                    ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
+                    deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
+                    ImageButton favButton = ((ImageButton)longClickView.findViewById(R.id.favorite));
+                    favButton.setTag(tag);
+                    int favLoc = locationOfFavorite(destinations.get(tag));
+                    if(favLoc == -1) {
+                        favButton.setColorFilter(Color.argb(0, 255,255,255));
+                    } else {
+                        favButton.setColorFilter(Color.argb(255, 255,255,0));
+                    }
+                    longClickView.setMinimumHeight(height);
+                    tempTable.removeView(arg0);
+                    tempTable.addView(longClickView, index);
+
+                    return true;
+                }
+            });
+            table.addView(row);
+        }
+
+        //If there is a start or end location selected, correctly paint the buttons
+        if(startLocation != null){
+            colorStarts(destinations.indexOf(startLocation));
+        }
+        if(endLocation != null){
+            colorEnds(destinations.indexOf(endLocation));
+        }
+        return true;
+    }
+
+    /*
+    This methods grabs all the buttons on the main screen (Build Route, Search, Add Current Location)
+    and sets up their onclicklisteners
+     */
+    public void initializeButtons(){
+        //establishes the Search Intent if search is selected
+        ImageButton searchButton = (ImageButton) findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Search.class);
@@ -117,10 +178,13 @@ public class MainScreen extends Activity implements LocationListener {
             }
 
         });
-        addCurrentLocationButton = (ImageButton) findViewById(R.id.addCurrentLocationButton);
-        addCurrentLocationButton.setOnClickListener(new OnClickListener() {
+
+        //Adds the current location to the list if this button is selected
+        ImageButton addCurrentLocationButton = (ImageButton) findViewById(R.id.addCurrentLocationButton);
+        addCurrentLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //checks that there is a current location found
                 if(currentLocation != null) {
                     Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
                     if(!checkRepeatedDestination(dest)) {
@@ -129,6 +193,7 @@ public class MainScreen extends Activity implements LocationListener {
                         buildTable();
                     }
                 } else {
+                    //Creates a dialog if there is no location
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
                     builder.setMessage("Can not find location. Go to GPS Settings")
                             .setCancelable(false)
@@ -145,10 +210,12 @@ public class MainScreen extends Activity implements LocationListener {
 
         });
 
-        buildRouteButton = (Button) findViewById(R.id.buildRouteButton);
-        buildRouteButton.setOnClickListener(new OnClickListener() {
+        //Button for creating the BuildRoute Intent when selected
+        Button buildRouteButton = (Button) findViewById(R.id.buildRouteButton);
+        buildRouteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Seperates the destinations into a 3 arrays representing their Names, Longs, and Lats
                 ArrayList<Destination> tempDest;
 
                 tempDest = sortDestinations();
@@ -156,20 +223,18 @@ public class MainScreen extends Activity implements LocationListener {
                 String urlString = "https://maps.googleapis.com/maps/api/directions/json?origin=";
                 Integer destSize = tempDest.size();
 
-                listOfDestLong = new double[destSize];
-                listOfDestLat = new double[destSize];
-                listOfDestNames = new ArrayList<String>();
+                double[] listOfDestLong = new double[destSize];
+                double[] listOfDestLat = new double[destSize];
+                ArrayList<String> listOfDestNames = new ArrayList<String>();
 
                 for(int i=0; i<destSize; i++){
-                    Log.e(TAG, "inside For Loop to grab names");
                     listOfDestNames.add(i,tempDest.get(i).name);
-                    Log.e(TAG, "Past add to Names ArrayList");
                     listOfDestLong[i] = tempDest.get(i).longitude;
                     listOfDestLat[i] = tempDest.get(i).latitude;
 
                 }
 
-
+                //Attaches these arrays to the Intent to be reassembled in the other activity
                 intent.putExtra("dName", listOfDestNames);
                 intent.putExtra("dLong", listOfDestLong);
                 intent.putExtra("dLat", listOfDestLat);
@@ -178,89 +243,6 @@ public class MainScreen extends Activity implements LocationListener {
             }
 
         });
-
-
-    }
-
-    //This first removes all views within the table if there are any, then builds
-    //it from scratch based on the contents of the Array List Destinations
-    public boolean buildTable() {
-        Button tempBuildRouteButton = (Button) findViewById(R.id.buildRouteButton);
-        if(destinations.size()>2) {
-            tempBuildRouteButton.setEnabled(true);
-        } else {
-            tempBuildRouteButton.setEnabled(false);
-        }
-
-
-        int count = table.getChildCount();
-//        table.removeAllViews();
-        for (int i = count - 1; i >= 0; i--) {
-            View child = table.getChildAt(i);
-
-            if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
-            if (child instanceof TableRow) table.removeView(child);
-        }
-        //Dynamically adds rows based on the size of the destinations array
-        for(int i = 0; i < destinations.size(); i++){
-            // Inflates the table_row_attributes.xml file
-            // not sure what inflates does, but I think I am doing this right....
-            TableRow row = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
-            int oriTest = getResources().getConfiguration().orientation;
-            if(getResources().getConfiguration().orientation == 2) {
-                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.text_layout));
-                ll.getLayoutParams().width = 1350;
-                ll.requestLayout();
-            }
-            //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
-            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
-            ImageButton startButton = (ImageButton)row.findViewById(R.id.start_button);
-            startButton.setTag(i);
-            startButton.setColorFilter(Color.argb(255, 150,200,150));
-            ImageButton endButton = (ImageButton)row.findViewById(R.id.end_Button);
-            endButton.setTag(i);
-            endButton.setColorFilter(Color.argb(255, 200,150,150));
-
-            row.setTag(i);
-            row.setOnLongClickListener(new View.OnLongClickListener() {
-                public boolean onLongClick(View arg0) {
-//                    arg0.setBackgroundColor(Color.rgb(226, 11, 11));
-                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
-                    int height =  arg0.getHeight();
-                    int tag = (Integer)arg0.getTag();
-                    ViewGroup tempTable = (ViewGroup)arg0.getParent();
-                    int index = tempTable.indexOfChild(arg0);
-
-                    ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
-                    ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
-                    deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
-                    ImageButton favButton = ((ImageButton)longClickView.findViewById(R.id.favorite));
-                    favButton.setTag(tag);
-                    int favLoc = locationOfFavorite(destinations.get(tag));
-                    if(favLoc == -1) {
-                        favButton.setColorFilter(Color.argb(0, 255,255,255)); // White Tint
-                    } else {
-                        favButton.setColorFilter(Color.argb(255, 255,255,0)); // White Tint
-                    }
-                    longClickView.setMinimumHeight(height);
-                    tempTable.removeView(arg0);
-                    tempTable.addView(longClickView, index);
-
-                    return true;
-                }
-            });
-            table.addView(row);
-        }
-        if(startLocation != null){
-
-            colorStarts(destinations.indexOf(startLocation));
-        }
-
-        if(endLocation != null){
-            colorEnds(destinations.indexOf(endLocation));
-        }
-        return true;
     }
 
     @Override
@@ -272,8 +254,8 @@ public class MainScreen extends Activity implements LocationListener {
 
     protected void onResume() {
         super.onResume();
-        ArrayList<Destination> tempDests = dbHelper.rlSelectAll();
-        recentDestinations = tempDests;
+        //Rebuilds the recent and favorite destinations, then rebuilds the table
+        recentDestinations = dbHelper.rlSelectAll();
         favoriteDestinations = dbHelper.favSelectAll();
         if(destinations.size() > 0){
             buildTable();
@@ -327,6 +309,10 @@ public class MainScreen extends Activity implements LocationListener {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+      This is called when ever the trash icon is clicked on a highlighted destination
+      It is in charge of removing the destination and updating the table
+     */
     public void deleteClick(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
@@ -334,6 +320,7 @@ public class MainScreen extends Activity implements LocationListener {
             ViewGroup tempTable = (ViewGroup)tempRow.getParent();
             tempTable.removeView(tempRow);
 
+            //Makes sure to clear this destinations from start/end if needed
             if(startLocation == destinations.get(cellNumber)){
                 startLocation = null;
             }
@@ -345,6 +332,11 @@ public class MainScreen extends Activity implements LocationListener {
         buildTable();
     }
 
+    /*
+      This is called when ever the favorite icon is clicked on a highlighted destination
+      It is in charge of adding or removing it from the favorites database and coloring
+      the icon accordingly
+     */
     public void favoriteClick(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
@@ -361,6 +353,7 @@ public class MainScreen extends Activity implements LocationListener {
         }
     }
 
+    //Lazy way to rebuild the table if cancel is clicked on a highlighted destination.
     public void cancelClick(View v){
         buildTable();
     }
@@ -375,11 +368,13 @@ public class MainScreen extends Activity implements LocationListener {
             //The 0 case was set earlier on as the case for the Search Activity
             case (0) : {
                 if (resultCode == Activity.RESULT_OK) {
+                    //This extracts the destination details from the intent and adds it to the destination
                     String newText = data.getStringExtra("dName");
                     double newLong = data.getDoubleExtra("dLong",0.0);
                     double newLat = data.getDoubleExtra("dLat",0.0);
                     Destination dest = new Destination(newText,newLong,newLat);
                     dest.address = data.getStringExtra("dAddress");
+                    //ensures it is not repeated, and then adds it to the recent database
                     if(!checkRepeatedDestination(dest)){
                         destinations.add(dest);
                     }
@@ -395,6 +390,10 @@ public class MainScreen extends Activity implements LocationListener {
         }
     }
 
+    /*
+    Method for easily adding test data to the table
+    Only used while in testing
+     */
     public void buildTestData() {
         Destination tempDist1= new Destination("The Ohio State University - Dreese Laboratories", -83.015941, 40.002357);
         tempDist1.address = "test address";
@@ -416,37 +415,52 @@ public class MainScreen extends Activity implements LocationListener {
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+    /*
+    This establishes location and stores the current location if it is found
+    GPS must be turned on to find location
+     */
+    public void establishLocation() {
+        //establishes locations
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isWifiEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        locationManager.removeUpdates(this);
+        if(locationManager != null && isGPSEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(currentLocation != null) {
+                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
+            }
+        } else if(locationManager != null && isWifiEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(currentLocation != null) {
+                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
+            }
+        }
     }
 
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
-
+    /*
+    This is called when the GPS option is selected in the menu, opens the GPS settings page
+     */
     public void clickGPS(){
         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
     }
 
+    /*
+    This is called when the Recent Locations is selected in the menu
+    It builds the intent for the Recent Activity
+     */
     public void clickRecent(){
         Intent intent = new Intent(getApplicationContext(), Recent.class);
         //starts the search activity with an id of 0
         startActivityForResult(intent, 0);
     }
 
+    /*
+    This is called when the Favorite Locations is selected in the menu
+    It builds the intent for the Favorite Activity
+     */
     public void clickFavorites(){
         Intent intent = new Intent(getApplicationContext(), Favorites.class);
         //starts the search activity with an id of 0
@@ -485,6 +499,10 @@ public class MainScreen extends Activity implements LocationListener {
         return tempDest;
     }
 
+    /*
+    This is called whenever a destination needs to be added to the recent destinations database
+    This updates the database to reflect the local ArrayList of recent destinations
+     */
     public void addRecentDestination(Destination destination) {
         recentDestinations.add(0, destination);
         if(recentDestinations.size() > 10) {
@@ -497,6 +515,10 @@ public class MainScreen extends Activity implements LocationListener {
         }
     }
 
+    /*
+    This is called whenever a destination needs to be added to the favorite destinations database
+    This updates the database to reflect the local ArrayList of favorite destinations
+     */
     public void addFavoriteDestination(Destination destination) {
         favoriteDestinations.add(0, destination);
         dbHelper.favDeleteAll();
@@ -506,6 +528,10 @@ public class MainScreen extends Activity implements LocationListener {
         }
     }
 
+    /*
+    This is called whenever a destination needs to be removed from the favorite destinations database
+    This updates the database to reflect the local ArrayList of favorite destinations
+     */
     public void removeFavoriteDestination(Destination destination, int location) {
         favoriteDestinations.remove(location);
         dbHelper.favDeleteAll();
@@ -515,6 +541,10 @@ public class MainScreen extends Activity implements LocationListener {
         }
     }
 
+    /*
+    returns the index of a destination from the favorites arraylist
+    or returns -1 if it is not located in the arraylist
+     */
     public int locationOfFavorite(Destination favDest) {
         for(int i = 0; i < favoriteDestinations.size(); i++) {
             if(favDest.equals(favoriteDestinations.get(i))) {
@@ -524,7 +554,7 @@ public class MainScreen extends Activity implements LocationListener {
         return -1;
     }
 
-
+    //Saves the local recent and favorites destinations to the database
     protected	void	onSaveInstanceState	(Bundle	outState){
         super.onSaveInstanceState(outState);
         Log.e(TAG, "++ SAVING!!! ++");
@@ -541,83 +571,75 @@ public class MainScreen extends Activity implements LocationListener {
 
     }
 
-
-    protected	void	onRestoreInstanceState	(Bundle	savedInstanceState)	{
-        super.onRestoreInstanceState(savedInstanceState);
-        restoreRecent();
-//        ArrayList<Destination> tempDests = dbHelper.selectAll();
-//        recentDestinations = tempDests;
-    }
-
-    public void restoreRecent() {
-
-    }
-
+    /*
+    This is called when a start icon is clicked
+    updates the start location global variable and recolors all the icons to reflect this
+     */
     public void startClicked(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
-            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
             colorStarts(cellNumber);
             startLocation = destinations.get(cellNumber);
-
-
         }
     }
 
+    /*
+    This is called when a end icon is clicked
+    updates the end location global variable and recolors all the icons to reflect this
+     */
     public void endClicked(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
-            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
             colorEnds(cellNumber);
             endLocation = destinations.get(cellNumber);
-
-
         }
     }
 
+    /*
+    Colors all the start icons to reflect their selected/unselected state
+     */
     public void colorStarts(int i){
         int count = table.getChildCount();
         for (int j = count - 1; j >= 0; j--) {
             View child = table.getChildAt(j);
-
             if (child instanceof TableRow){
                 ImageButton startTemp = (ImageButton)child.findViewById(R.id.start_button);
                 if ((Integer)startTemp.getTag() == i){
-                    //startTemp.setBackgroundColor(0xFF00CC00);
-                    startTemp.setColorFilter(Color.argb(255, 0,200,0));
-
+                    //this is the selected start
+                    startTemp.setColorFilter(Color.argb(255, 0,200,0)); //bright green
                 }
                 else{
-                    //startTemp.setBackgroundColor(0xFF99EB99);
-                    startTemp.setColorFilter(Color.argb(255, 150,200,150));
+                    //this  is an unselected start
+                    startTemp.setColorFilter(Color.argb(255, 150,200,150)); //faded green
                 }
-
             };
         }
     }
 
+    /*
+    Colors all the end icons to reflect their selected/unselected state
+     */
     public void colorEnds(int i){
         int count = table.getChildCount();
         for (int j = count - 1; j >= 0; j--) {
             View child = table.getChildAt(j);
-
             if (child instanceof TableRow){
                 ImageButton endTemp = (ImageButton)child.findViewById(R.id.end_Button);
                 if ((Integer)endTemp.getTag() == i){
-                    //endTemp.setBackgroundColor(0xFFFF0000);
-                    endTemp.setColorFilter(Color.argb(255, 200,0,0));
-
+                    //this is the selected end
+                    endTemp.setColorFilter(Color.argb(255, 200,0,0)); //bright red
                 }
                 else{
-                    //endTemp.setBackgroundColor(0xFFFF9999);
-                    endTemp.setColorFilter(Color.argb(255, 200,150,150));
+                    //this  is an unselected start
+                    endTemp.setColorFilter(Color.argb(255, 200,150,150)); //faded red
                 }
-
             };
         }
 
     }
 
+    //just checks if the destinations arraylist contains the parameter dest
+    // the .contains method was not working despite correctly overriding .equals, so this is the ugly solution
     public boolean checkRepeatedDestination(Destination tempDest) {
         for(int i = 0; i < destinations.size(); i++) {
             if (tempDest.equals(destinations.get(i))){
@@ -627,6 +649,8 @@ public class MainScreen extends Activity implements LocationListener {
         return false;
     }
 
+    //just checks if the recentdestinations arraylist contains the parameter dest
+    // the .contains method was not working despite correctly overriding .equals, so this is the ugly solution
     public boolean checkRepeatedRecentDestination(Destination tempDest) {
         for(int i = 0; i < recentDestinations.size(); i++) {
             if (tempDest.equals(recentDestinations.get(i))){
@@ -636,5 +660,27 @@ public class MainScreen extends Activity implements LocationListener {
         return false;
     }
 
+    //******These Methods are required for location manager******
+    @Override
+    public void onLocationChanged(Location location) {
+        //Removes updates once a locaiton is found, beeter on battery life
+        locationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+    //*************************************************************
 }
 
