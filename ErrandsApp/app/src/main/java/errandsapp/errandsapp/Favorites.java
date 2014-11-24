@@ -3,6 +3,7 @@ package errandsapp.errandsapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -82,7 +84,9 @@ public class Favorites extends Activity {
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
-            row.findViewById(R.id.delete_Button).setTag(i);
+            ImageButton deleteButton = (ImageButton)row.findViewById(R.id.delete_Button);
+            deleteButton.setTag(i);
+            deleteButton.setColorFilter(Color.argb(255, 255, 0, 0)); // White Tint
             row.setTag(i);
             table.addView(row);
         }

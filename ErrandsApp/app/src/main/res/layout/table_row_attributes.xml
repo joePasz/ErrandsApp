@@ -49,29 +49,28 @@
        android:layout_width="wrap_content"
        android:layout_weight="1">
 
-    <Button android:id="@+id/start_button"
-         android:text="@string/start_button"
+
+    <ImageButton android:id="@+id/start_button"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:layout_weight="1"
-         android:textSize="8dp"
+        android:src="@drawable/start_icon"
          android:layout_gravity="center"
-         android:background="#99EB99"
          android:padding="3dp"
          android:layout_margin="5dp"
          android:onClick="startClicked"
+        android:background="@null"
          />
-        <Button android:id="@+id/end_Button"
-        android:text="@string/end_button"
+        <ImageButton android:id="@+id/end_Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="8dp"
+            android:src="@drawable/end_icon"
         android:layout_gravity="center"
-        android:background="#FF9999"
         android:padding="3dp"
         android:layout_margin="5dp"
         android:onClick="endClicked"
+            android:background="@null"
         />
 
 

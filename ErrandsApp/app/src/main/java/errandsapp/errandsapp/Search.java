@@ -1,7 +1,9 @@
 package errandsapp.errandsapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -9,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -97,42 +100,26 @@ public class Search extends Activity implements LocationListener{
 
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable(){
+                if(currentLocation == null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Search.this);
+                    builder.setMessage("Location not found. Go to GPS Settings?")
+                            .setCancelable(false)
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    runGoogleSearchQuery();
+                                }
+                            })
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    clickGPS();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    runGoogleSearchQuery();
+                }
 
-                    public void run(){
-                        String inputString = input.getText().toString();
-                        inputString = inputString.replace(' ', '+');
-                        String URLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + inputString;
-                        if(currentLocation != null) {
-                            URLString = URLString + "&location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude() + "&radius=5000";
-                        }
-                        URLString = URLString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
-                        String searchResultString = getUrlContents(URLString);
-                        try {
-                            JSONObject searchResultJSON = new JSONObject(searchResultString);
-                            JSONArray resultsJSONArray = searchResultJSON.getJSONArray("results");
-                            destinations.clear();
-                            for(int i = 0; i < resultsJSONArray.length(); i++) {
-                                JSONObject result = (JSONObject)resultsJSONArray.get(i);
-                                JSONObject geometry = (JSONObject) result.get("geometry");
-                                JSONObject location = (JSONObject) geometry.get("location");
-                                Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lng"),(Double) location.get("lat"));
-                                tempDest.address = result.getString("formatted_address");
-                                destinations.add(tempDest);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Message msg = Message.obtain();
-                        msg.what = 0;
-                        handler.sendMessage(msg);
-
-                    }
-
-//                    protected void onPostExecute() {
-//                        buildTable();
-//                    }
-                }).start();
 
 
                 //finish();
@@ -141,6 +128,45 @@ public class Search extends Activity implements LocationListener{
         });
 
 
+    }
+
+    public void runGoogleSearchQuery() {
+        new Thread(new Runnable(){
+
+            public void run(){
+                String inputString = input.getText().toString();
+                inputString = inputString.replace(' ', '+');
+                String URLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + inputString;
+                if(currentLocation != null) {
+                    URLString = URLString + "&location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude() + "&radius=5000";
+                }
+                URLString = URLString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+                String searchResultString = getUrlContents(URLString);
+                try {
+                    JSONObject searchResultJSON = new JSONObject(searchResultString);
+                    JSONArray resultsJSONArray = searchResultJSON.getJSONArray("results");
+                    destinations.clear();
+                    for(int i = 0; i < resultsJSONArray.length(); i++) {
+                        JSONObject result = (JSONObject)resultsJSONArray.get(i);
+                        JSONObject geometry = (JSONObject) result.get("geometry");
+                        JSONObject location = (JSONObject) geometry.get("location");
+                        Destination tempDest = new Destination(result.getString("name"),(Double) location.get("lng"),(Double) location.get("lat"));
+                        tempDest.address = result.getString("formatted_address");
+                        destinations.add(tempDest);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Message msg = Message.obtain();
+                msg.what = 0;
+                handler.sendMessage(msg);
+
+            }
+
+//                    protected void onPostExecute() {
+//                        buildTable();
+//                    }
+        }).start();
     }
 
     //This first removes all views within the table if there are any, then builds
@@ -256,6 +282,11 @@ public class Search extends Activity implements LocationListener{
         }
         return content.toString();
     }
+
+    public void clickGPS(){
+        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+    }
+
 
 
     //Following are location methods!!

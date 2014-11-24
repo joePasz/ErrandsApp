@@ -1,7 +1,9 @@
 package errandsapp.errandsapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -118,10 +120,26 @@ public class MainScreen extends Activity implements LocationListener {
         addCurrentLocationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
-                destinations.add(dest);
-                //rebuild table
-                buildTable();
+                if(currentLocation != null) {
+                    Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
+                    if(!checkRepeatedDestination(dest)) {
+                        destinations.add(dest);
+                        //rebuild table
+                        buildTable();
+                    }
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
+                    builder.setMessage("Can not find location. Go to GPS Settings")
+                            .setCancelable(false)
+                            .setNegativeButton("Cancel", null)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    clickGPS();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
             }
 
         });
@@ -190,8 +208,12 @@ public class MainScreen extends Activity implements LocationListener {
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);
-            row.findViewById(R.id.start_button).setTag(i);
-            row.findViewById(R.id.end_Button).setTag(i);
+            ImageButton startButton = (ImageButton)row.findViewById(R.id.start_button);
+            startButton.setTag(i);
+            startButton.setColorFilter(Color.argb(255, 150,200,150));
+            ImageButton endButton = (ImageButton)row.findViewById(R.id.end_Button);
+            endButton.setTag(i);
+            endButton.setColorFilter(Color.argb(255, 200,150,150));
 
             row.setTag(i);
             row.setOnLongClickListener(new View.OnLongClickListener() {
@@ -391,6 +413,7 @@ public class MainScreen extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
+
         locationManager.removeUpdates(this);
     }
 
@@ -553,13 +576,15 @@ public class MainScreen extends Activity implements LocationListener {
             View child = table.getChildAt(j);
 
             if (child instanceof TableRow){
-                Button startTemp = (Button)child.findViewById(R.id.start_button);
+                ImageButton startTemp = (ImageButton)child.findViewById(R.id.start_button);
                 if ((Integer)startTemp.getTag() == i){
-                    startTemp.setBackgroundColor(0xFF00CC00);
+                    //startTemp.setBackgroundColor(0xFF00CC00);
+                    startTemp.setColorFilter(Color.argb(255, 0,200,0));
 
                 }
                 else{
-                    startTemp.setBackgroundColor(0xFF99EB99);
+                    //startTemp.setBackgroundColor(0xFF99EB99);
+                    startTemp.setColorFilter(Color.argb(255, 150,200,150));
                 }
 
             };
@@ -572,13 +597,15 @@ public class MainScreen extends Activity implements LocationListener {
             View child = table.getChildAt(j);
 
             if (child instanceof TableRow){
-                Button endTemp = (Button)child.findViewById(R.id.end_Button);
+                ImageButton endTemp = (ImageButton)child.findViewById(R.id.end_Button);
                 if ((Integer)endTemp.getTag() == i){
-                    endTemp.setBackgroundColor(0xFFFF0000);
+                    //endTemp.setBackgroundColor(0xFFFF0000);
+                    endTemp.setColorFilter(Color.argb(255, 200,0,0));
 
                 }
                 else{
-                    endTemp.setBackgroundColor(0xFFFF9999);
+                    //endTemp.setBackgroundColor(0xFFFF9999);
+                    endTemp.setColorFilter(Color.argb(255, 200,150,150));
                 }
 
             };
