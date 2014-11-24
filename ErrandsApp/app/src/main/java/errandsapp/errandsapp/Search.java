@@ -2,6 +2,7 @@ package errandsapp.errandsapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,12 +49,26 @@ public class Search extends Activity implements LocationListener{
     private LocationManager locationManager;
     private Location currentLocation;
     LayoutInflater inflater;
+    ProgressDialog indicator;
+
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what){
                 case 0:
+                    indicator.dismiss();
                     buildTable();
+                    break;
+                case 1:
+                    if(indicator.isShowing()) {
+                        indicator.dismiss();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Search.this);
+                        builder.setMessage("Search Failed! (Possible Network Issues)")
+                                .setCancelable(false)
+                                .setNegativeButton("Cancel", null);
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    }
                     break;
             }
         }
@@ -131,7 +146,21 @@ public class Search extends Activity implements LocationListener{
     }
 
     public void runGoogleSearchQuery() {
-        new Thread(new Runnable(){
+        destinations.clear();
+        buildTable();
+        indicator = new ProgressDialog(this);
+        indicator.setMessage("Searching...");
+        indicator.setCancelable(false);
+
+        indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        indicator.show();
+
+        Thread googleSearch = new Thread(new Runnable(){
 
             public void run(){
                 String inputString = input.getText().toString();
@@ -154,19 +183,23 @@ public class Search extends Activity implements LocationListener{
                         tempDest.address = result.getString("formatted_address");
                         destinations.add(tempDest);
                     }
+                    Message msg = Message.obtain();
+                    msg.what = 0;
+                    handler.sendMessage(msg);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Message msg = Message.obtain();
+                    msg.what = 1;
+                    handler.sendMessage(msg);
                 }
-                Message msg = Message.obtain();
-                msg.what = 0;
-                handler.sendMessage(msg);
 
             }
 
 //                    protected void onPostExecute() {
 //                        buildTable();
 //                    }
-        }).start();
+        });
+        googleSearch.start();
     }
 
     //This first removes all views within the table if there are any, then builds
