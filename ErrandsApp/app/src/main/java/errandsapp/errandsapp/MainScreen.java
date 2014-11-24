@@ -95,7 +95,6 @@ public class MainScreen extends Activity implements LocationListener {
         int count = table.getChildCount();
         for (int i = count - 1; i >= 0; i--) {
             View child = table.getChildAt(i);
-
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
             if (child instanceof TableRow) table.removeView(child);
         }
@@ -429,13 +428,11 @@ public class MainScreen extends Activity implements LocationListener {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
             }
         } else if(locationManager != null && isWifiEnabled) {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
             }
         }
     }

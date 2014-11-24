@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,12 +37,8 @@ import java.util.ArrayList;
 
 
 public class Search extends Activity implements LocationListener{
-
-
-
-    private TextView info;
+    //global variables
     private EditText input;
-    private ImageButton goSearch;
     private ArrayList<Destination> destinations;
     private TableLayout table;
     private LocationManager locationManager;
@@ -51,17 +46,21 @@ public class Search extends Activity implements LocationListener{
     LayoutInflater inflater;
     ProgressDialog indicator;
 
+    //This handler is passed messages at the end of the html request thread
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what){
+                //This is called when the request is successful
                 case 0:
                     indicator.dismiss();
                     buildTable();
                     break;
+                //this case is called during a failed request
                 case 1:
                     if(indicator.isShowing()) {
                         indicator.dismiss();
+                        //Builds alert dialog to inform the user it failed
                         AlertDialog.Builder builder = new AlertDialog.Builder(Search.this);
                         builder.setMessage("Search Failed! (Possible Network Issues)")
                                 .setCancelable(false)
@@ -73,7 +72,6 @@ public class Search extends Activity implements LocationListener{
             }
         }
     };
-
     private final String TAG = ((Object) this).getClass().getSimpleName();
 
     @Override
@@ -81,50 +79,42 @@ public class Search extends Activity implements LocationListener{
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_search);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isWifiEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if(locationManager != null && isGPSEnabled) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
-            }
-        } else if(locationManager != null && isWifiEnabled) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-            currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if(currentLocation != null) {
-                Log.e(TAG, "Long: " + currentLocation.getLongitude() + " Lat: " + currentLocation.getLatitude());
-            }
-        }
+        //initilize global variables
         destinations = new ArrayList<Destination>();
         inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        establishLocation();
 
-        Intent intent = getIntent();
-
-        //build main table
+        //build table and screen
+        input = (EditText)findViewById(R.id.searchBar);
         table = (TableLayout)findViewById(R.id.table);
         table.bringToFront();
         buildTable();
+        initializeSearchButton();
+    }
 
-        info = (TextView) findViewById(R.id.searchBarResult);
-        input = (EditText)findViewById(R.id.searchBar);
-        goSearch = (ImageButton) findViewById(R.id.searchButton);
-        goSearch.setOnClickListener(new OnClickListener() {
-
+    /*
+    This method sets up the onclicklistener for the search button
+    This onClick takes the text in the input box and starts and google places request
+    Also uses the users current location if available
+     */
+    public void initializeSearchButton(){
+        ((ImageButton)findViewById(R.id.searchButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(currentLocation == null) {
+                    //builds an alert dialog to inform the user there is no location found
                     AlertDialog.Builder builder = new AlertDialog.Builder(Search.this);
                     builder.setMessage("Location not found. Go to GPS Settings?")
                             .setCancelable(false)
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                //cancel runs the search anyway
                                 public void onClick(DialogInterface dialog, int id) {
                                     runGoogleSearchQuery();
                                 }
                             })
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                //OK opens the GPS settings
                                 public void onClick(DialogInterface dialog, int id) {
                                     clickGPS();
                                 }
@@ -132,26 +122,26 @@ public class Search extends Activity implements LocationListener{
                     AlertDialog alert = builder.create();
                     alert.show();
                 } else {
+                    //location found, run the query
                     runGoogleSearchQuery();
                 }
-
-
-
-                //finish();
             }
 
         });
-
-
     }
 
+    /*
+    This method handles the google Place request
+     */
     public void runGoogleSearchQuery() {
+        //First, clears the table if needed
         destinations.clear();
         buildTable();
+
+        //Then builds indicator to inform the user it is searching
         indicator = new ProgressDialog(this);
         indicator.setMessage("Searching \"" + input.getText().toString() + "\"...");
         indicator.setCancelable(false);
-
         indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -160,21 +150,29 @@ public class Search extends Activity implements LocationListener{
         });
         indicator.show();
 
+        //Finally builds thread that runs the request
         Thread googleSearch = new Thread(new Runnable(){
 
             public void run(){
+                //takes the user input text
                 String inputString = input.getText().toString();
+                //formats the string into an http request
                 inputString = inputString.replace(' ', '+');
                 String URLString = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + inputString;
                 if(currentLocation != null) {
+                    //adds location if available
                     URLString = URLString + "&location=" + currentLocation.getLatitude() + "," + currentLocation.getLongitude() + "&radius=5000";
                 }
                 URLString = URLString + "&key=AIzaSyDgoZ4AG4pxViHeKbAHEChnDrknUNmQIYY";
+
+                //Runs the request and takes the response as a string
                 String searchResultString = getUrlContents(URLString);
+
                 try {
+                    //turns the response into a JSON object
                     JSONObject searchResultJSON = new JSONObject(searchResultString);
+                    //parses the object to find each returned location and adds them to the destinations arraylist
                     JSONArray resultsJSONArray = searchResultJSON.getJSONArray("results");
-                    destinations.clear();
                     for(int i = 0; i < resultsJSONArray.length(); i++) {
                         JSONObject result = (JSONObject)resultsJSONArray.get(i);
                         JSONObject geometry = (JSONObject) result.get("geometry");
@@ -183,11 +181,14 @@ public class Search extends Activity implements LocationListener{
                         tempDest.address = result.getString("formatted_address");
                         destinations.add(tempDest);
                     }
+                    //informs the message handler that is has been sucessful
                     Message msg = Message.obtain();
                     msg.what = 0;
                     handler.sendMessage(msg);
                 } catch (JSONException e) {
+                    //error found, usually network related problem
                     e.printStackTrace();
+                    //informs the message handler that is failed
                     Message msg = Message.obtain();
                     msg.what = 1;
                     handler.sendMessage(msg);
@@ -202,9 +203,12 @@ public class Search extends Activity implements LocationListener{
         googleSearch.start();
     }
 
-    //This first removes all views within the table if there are any, then builds
-    //it from scratch based on the contents of the Array List Destinations
+
+    /*
+    Method that is called whenever the table needs to be refreshed
+     */
     public boolean buildTable() {
+        //first clears the table of previous entries
         int count = table.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = table.getChildAt(i);
@@ -212,8 +216,7 @@ public class Search extends Activity implements LocationListener{
         }
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
-            // Inflates the table_row_attributes.xml file
-            // not sure what inflates does, but I think I am doing this right....
+            // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
@@ -224,10 +227,15 @@ public class Search extends Activity implements LocationListener{
         return true;
     }
 
+    /*
+    Method that is called when a cell is clicked
+    It finds which cell was selected by using the tag established in buildtable
+    this tag links the row with the destinations index
+    It then builds an intent to return to the mainscreen with the contents of the selected destination
+     */
     public void clickHandlerCell(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
-            Log.d(TAG, "cell: " + v.getTag() + " Clicked!!!!");
             Destination clickedDest = destinations.get(cellNumber);
 
             Intent resultIntent = new Intent();
@@ -293,34 +301,61 @@ public class Search extends Activity implements LocationListener{
     }
 
 
-
+    /*
+    Wonderful method borrowed and modified from StackOverflow which takes a url, establish a connection
+    then reads the response and returns said response as a string
+     */
     private String getUrlContents(String theUrl) {
         StringBuilder content = new StringBuilder();
         try {
             URL url = new URL(theUrl);
             URLConnection urlConnection = url.openConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
+            //reads the response
+            BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()), 8);
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 content.append(line + "\n");
             }
-            bufferedReader.close();
+            br.close();
         }catch (Exception e) {
+            //error occured, usually network related
             e.printStackTrace();
         }
         return content.toString();
     }
 
+    /*
+    method that builds the intent to open the GPS settings
+     */
     public void clickGPS(){
         startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
     }
 
+    /*
+    Establishes the current location if GPS is turned on
+     */
+    public void establishLocation(){
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isWifiEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
+        if(locationManager != null && isGPSEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(currentLocation != null) {
+            }
+        } else if(locationManager != null && isWifiEnabled) {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(currentLocation != null) {
+            }
+        }
+    }
 
     //Following are location methods!!
     @Override
     public void onLocationChanged(Location location) {
-        //Should stop updating location once it has been found once.
+        //Should stop updating location once it has been found once. Saves battery
         locationManager.removeUpdates(this);
     }
 
