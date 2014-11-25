@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="errandsapp.errandsapp.Search">
 
     <TableLayout
@@ -16,53 +16,43 @@
         <LinearLayout>
 
             <EditText
+                android:id="@+id/searchBar"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/searchBar"
-                android:hint="Enter Search"
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="10dp"
                 android:actionViewClass="android.widget.SearchView"
-                android:imeOptions="actionNext"/>
-
+                android:hint="Enter Search"
+                android:imeOptions="actionNext" />
 
 
             <ImageButton
-            android:id="@+id/searchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_search"
-            android:layout_gravity="center_horizontal"
-            android:layout_alignTop="@+id/searchBar"
-            android:layout_toRightOf="@+id/searchBar"
-            android:layout_marginLeft="32dp" />
-
-        </LinearLayout>
-
-        <LinearLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/searchBarResult"
-            android:layout_below="@+id/searchBar"
-            android:layout_centerHorizontal="true" />
-        </LinearLayout>
-
-        <LinearLayout>
-
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TableLayout
-                android:id="@+id/table"
-                android:layout_width="match_parent"
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/searchBarResult">
+                android:layout_alignTop="@+id/searchBar"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="32dp"
+                android:layout_toRightOf="@+id/searchBar"
+                android:src="@drawable/ic_action_search" />
 
-            </TableLayout>
+        </LinearLayout>
 
-        </ScrollView>
+        <LinearLayout>
+
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TableLayout
+                    android:id="@+id/table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </TableLayout>
+
+            </ScrollView>
         </LinearLayout>
 
     </TableLayout>

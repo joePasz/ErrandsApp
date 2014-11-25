@@ -134,7 +134,7 @@ public class Map extends FragmentActivity {
     //Takes a google encoded polyline and returns an ArrayList of LatLngs
     private ArrayList<LatLng> decodePoly(String encoded) {
 
-        Log.i("Location", "String received: " + encoded);
+        //Log.i("Location", "String received: " + encoded);
         ArrayList<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
@@ -163,9 +163,9 @@ public class Map extends FragmentActivity {
             poly.add(p);
         }
 
-        for (int i = 0; i < poly.size(); i++) {
-            Log.i("Location", "Point sent: Latitude: " + poly.get(i).latitude + " Longitude: " + poly.get(i).longitude);
-        }
+//        for (int i = 0; i < poly.size(); i++) {
+//            Log.i("Location", "Point sent: Latitude: " + poly.get(i).latitude + " Longitude: " + poly.get(i).longitude);
+//        }
         return poly;
     }
 

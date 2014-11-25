@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -78,6 +79,14 @@ public class Recent extends Activity {
         for(int i = 0; i < destinations.size(); i++){
             // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
+
+            //Finds oritentation and alters the row width if in landscape
+            if(getResources().getConfiguration().orientation == 2) {
+                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.layout_contents));
+                ll.getLayoutParams().width = 1700;
+                ll.requestLayout();
+            }
+
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(destinations.get(i).address);

@@ -2,62 +2,64 @@
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:longClickable="true"
-    android:background="#EEEEEE">
+    android:background="#EEEEEE"
+    android:longClickable="true">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_weight="5"
-        android:layout_width="match_parent"
+        android:id="@+id/long_click"
+        android:layout_width="327dp"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical">
+        android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:src="@drawable/ic_action_cancel"
-        android:padding="3dp"
-        android:clickable="true"
-        android:onClick="cancelClick"
-        android:layout_gravity="center_vertical"
-        android:background="@null"
-        />
-    <ImageButton
-        android:id="@+id/favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:src="@drawable/ic_action_favorite"
-        android:clickable="true"
-        android:onClick="favoriteClick"
-        android:padding="5dp"
-        android:layout_gravity="center_vertical"
-        android:background="@null"
-        />
-    <ImageButton
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:src="@drawable/ic_action_discard"
-        android:padding="3dp"
-        android:clickable="true"
-        android:onClick="deleteClick"
-        android:layout_gravity="center_vertical"
-        android:background="@null"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@null"
+                android:clickable="true"
+                android:onClick="cancelClick"
+                android:padding="3dp"
+                android:src="@drawable/ic_action_cancel" />
+
+            <ImageButton
+                android:id="@+id/favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@null"
+                android:clickable="true"
+                android:onClick="favoriteClick"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_favorite" />
+
+            <ImageButton
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@null"
+                android:clickable="true"
+                android:onClick="deleteClick"
+                android:padding="3dp"
+                android:src="@drawable/ic_action_discard" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@android:color/darker_gray" />
     </LinearLayout>
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_gravity="bottom"/>
-</LinearLayout>
 
 </TableRow>

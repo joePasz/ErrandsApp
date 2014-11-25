@@ -131,6 +131,13 @@ public class MainScreen extends Activity implements LocationListener {
                     ViewGroup tempTable = (ViewGroup)arg0.getParent();
                     int index = tempTable.indexOfChild(arg0);
 
+                    //Finds oritentation and alters the row width if in landscape
+                    if(getResources().getConfiguration().orientation == 2) {
+                        LinearLayout ll = ((LinearLayout)longClickView.findViewById(R.id.long_click));
+                        ll.getLayoutParams().width = 1700;
+                        ll.requestLayout();
+                    }
+
                     ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
                     ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
                     deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
@@ -226,18 +233,20 @@ public class MainScreen extends Activity implements LocationListener {
                 double[] listOfDestLong = new double[destSize];
                 double[] listOfDestLat = new double[destSize];
                 ArrayList<String> listOfDestNames = new ArrayList<String>();
+                ArrayList<String> listOfDestAddr = new ArrayList<String>();
 
                 for(int i=0; i<destSize; i++){
                     listOfDestNames.add(i,tempDest.get(i).name);
                     listOfDestLong[i] = tempDest.get(i).longitude;
                     listOfDestLat[i] = tempDest.get(i).latitude;
-
+                    listOfDestAddr.add(tempDest.get(i).address);
                 }
 
                 //Attaches these arrays to the Intent to be reassembled in the other activity
                 intent.putExtra("dName", listOfDestNames);
                 intent.putExtra("dLong", listOfDestLong);
                 intent.putExtra("dLat", listOfDestLat);
+                intent.putExtra("dAddr", listOfDestAddr);
 
                 startActivityForResult(intent, 1);
             }

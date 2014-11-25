@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -100,9 +101,11 @@ public class BuildRoute extends Activity {
         ArrayList<String> listOfDestNames = intent.getStringArrayListExtra("dName");
         double[] listOfDestLong = intent.getDoubleArrayExtra("dLong");
         double[] listOfDestLat = intent.getDoubleArrayExtra("dLat");
+        ArrayList <String> listOfDestAddr = intent.getStringArrayListExtra("dAddr");
 
         for(int i=0; i < listOfDestNames.size(); i++){
             Destination des = new Destination(listOfDestNames.get(i), listOfDestLong[i], listOfDestLat[i]);
+            des.address = listOfDestAddr.get(i);
             destinations.add(i, des);
         }
     }
@@ -331,8 +334,16 @@ public class BuildRoute extends Activity {
         for(int i = 0; i < orderedDestinations.size(); i++){
             // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
+
+            //Finds oritentation and alters the row width if in landscape
+            if(getResources().getConfiguration().orientation == 2) {
+                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.layout_contents));
+                ll.getLayoutParams().width = 1700;
+                ll.requestLayout();
+            }
+
             //adds contents of the destination to the row
-            ((TextView)row.findViewById(R.id.desti)).setText(orderedDestinations.get(i).name);
+            ((TextView)row.findViewById(R.id.desti)).setText((i+1) + ") " + orderedDestinations.get(i).name);
             ((TextView)row.findViewById(R.id.address)).setText(orderedDestinations.get(i).address);
             table.addView(row);
         }
@@ -398,6 +409,10 @@ public class BuildRoute extends Activity {
 
         polylineEncodedString = savedInstanceState.getString("poly");
         buildTable();
+    }
+
+    public void clickHandlerCell(View v){
+        //Must keep as it needed since we are reusing the search_result table row layout
     }
 
 }

@@ -13,9 +13,10 @@
 
             <!--Layout for the Destination and the Address -->
             <LinearLayout
+                android:id="@+id/layout_contents"
                 android:orientation="vertical"
                 android:layout_weight="5"
-                android:layout_width="match_parent"
+                android:layout_width="320dp"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/desti"
