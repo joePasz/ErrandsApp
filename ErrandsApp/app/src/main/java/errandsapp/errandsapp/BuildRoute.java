@@ -87,28 +87,9 @@ public class BuildRoute extends Activity {
                 (Context.LAYOUT_INFLATER_SERVICE);
         table = (TableLayout)findViewById(R.id.table);
         table.bringToFront();
-        //creates and starts the ProgressDialog to inform the user it is building the optimized route
-        indicator = new ProgressDialog(this);
-        indicator.setMessage("Building Optimized Route");
-        indicator.setCancelable(false);
-        indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                BuildRoute.this.finish();
-            }
-        });
-        indicator.show();
-
-        //Rebuilds the destinations array from the intent, and then uses this to build the requestURL
-        buildDestinationsFromIntent();
-        directionsRequestUrl = buildGoogleDirectionsRequest();
 
         //initilize the build map button
         initializeBuildMapButton();
-
-        //Finally runs the directions request which uses the url build earlier
-        runGoogleDirectionsQuery();
     }
 
     /*
@@ -249,6 +230,27 @@ public class BuildRoute extends Activity {
     protected void onResume() {
         super.onResume();
         Log.e(TAG, "++ In onResume() ++");
+        if(orderedDestinations.size() ==0) {
+            //creates and starts the ProgressDialog to inform the user it is building the optimized route
+            indicator = new ProgressDialog(this);
+            indicator.setMessage("Building Optimized Route");
+            indicator.setCancelable(false);
+            indicator.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    BuildRoute.this.finish();
+                }
+            });
+            indicator.show();
+
+            //Rebuilds the destinations array from the intent, and then uses this to build the requestURL
+            buildDestinationsFromIntent();
+            directionsRequestUrl = buildGoogleDirectionsRequest();
+
+            //Finally runs the directions request which uses the url build earlier
+            runGoogleDirectionsQuery();
+        }
     }
     protected void onStart() {
         super.onStart();
@@ -326,7 +328,7 @@ public class BuildRoute extends Activity {
         }
 
         //Dynamically adds rows based on the size of the destinations array
-        for(int i = 0; i < destinations.size(); i++){
+        for(int i = 0; i < orderedDestinations.size(); i++){
             // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
@@ -374,11 +376,13 @@ public class BuildRoute extends Activity {
         outState.putDoubleArray("dLong", listOfDestLong);
         outState.putDoubleArray("dLat", listOfDestLat);
         outState.putStringArrayList("dAddr", listOfDestAddr);
+        outState.putString("poly", polylineEncodedString);
         super.onSaveInstanceState(outState);
     }
 
     //restore the state of the app by recreating the ordered destinations arraylist
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.e(TAG, "++ RESTORING!!! ++");
         super.onRestoreInstanceState(savedInstanceState);
         ArrayList<String> tempDestNames = savedInstanceState.getStringArrayList("dName");
         double[] tempDestLongs = savedInstanceState.getDoubleArray("dLong");
@@ -391,6 +395,8 @@ public class BuildRoute extends Activity {
             tempDest.address = tempDestAddr.get(i);
             orderedDestinations.add(tempDest);
         }
+
+        polylineEncodedString = savedInstanceState.getString("poly");
         buildTable();
     }
 
