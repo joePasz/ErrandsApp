@@ -18,7 +18,7 @@
             <!--Layout for the Destination and the Address -->
             <LinearLayout
                 android:id="@+id/text_layout"
-                android:layout_width="200dp"
+                android:layout_width="210dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="left"

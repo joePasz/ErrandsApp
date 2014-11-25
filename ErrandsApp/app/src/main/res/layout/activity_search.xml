@@ -16,7 +16,7 @@
         <LinearLayout>
 
             <EditText
-                android:layout_width="275dp"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/searchBar"
                 android:hint="Enter Search"

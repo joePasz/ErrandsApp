@@ -353,4 +353,45 @@ public class BuildRoute extends Activity {
         return orderedDestinations;
     }
 
+    ///Save the state of the current ordered destinations table
+    protected	void	onSaveInstanceState	(Bundle	outState){
+        Log.e(TAG, "++ SAVING!!! ++");
+
+        //grab all the contents of each destination
+        double[] listOfDestLong = new double[orderedDestinations.size()];
+        double[] listOfDestLat = new double[orderedDestinations.size()];
+        ArrayList<String> listOfDestNames = new ArrayList<String>();
+        ArrayList<String> listOfDestAddr = new ArrayList<String>();
+        for(int i=0; i<orderedDestinations.size(); i++){
+            listOfDestNames.add(i,orderedDestinations.get(i).name);
+            listOfDestLong[i] = orderedDestinations.get(i).longitude;
+            listOfDestLat[i] = orderedDestinations.get(i).latitude;
+            listOfDestAddr.add(orderedDestinations.get(i).address);
+        }
+
+        //Store the contents of each destination in the saved bundled
+        outState.putStringArrayList("dName", listOfDestNames);
+        outState.putDoubleArray("dLong", listOfDestLong);
+        outState.putDoubleArray("dLat", listOfDestLat);
+        outState.putStringArrayList("dAddr", listOfDestAddr);
+        super.onSaveInstanceState(outState);
+    }
+
+    //restore the state of the app by recreating the ordered destinations arraylist
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ArrayList<String> tempDestNames = savedInstanceState.getStringArrayList("dName");
+        double[] tempDestLongs = savedInstanceState.getDoubleArray("dLong");
+        double[] tempDestLats = savedInstanceState.getDoubleArray("dLat");
+        ArrayList<String> tempDestAddr = savedInstanceState.getStringArrayList("dAddr");
+
+        orderedDestinations.clear();
+        for(int i=0; i<tempDestNames.size(); i++){
+            Destination tempDest = new Destination(tempDestNames.get(i),tempDestLongs[i],tempDestLats[i]);
+            tempDest.address = tempDestAddr.get(i);
+            orderedDestinations.add(tempDest);
+        }
+        buildTable();
+    }
+
 }

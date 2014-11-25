@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -551,8 +552,8 @@ public class MainScreen extends Activity implements LocationListener {
     }
 
     //Saves the local recent and favorites destinations to the database
+    //also save the state of the current destinations table
     protected	void	onSaveInstanceState	(Bundle	outState){
-        super.onSaveInstanceState(outState);
         Log.e(TAG, "++ SAVING!!! ++");
         dbHelper.rlDeleteAll();
         for(int i = 0; i < recentDestinations.size(); i++) {
@@ -565,7 +566,44 @@ public class MainScreen extends Activity implements LocationListener {
             dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
         }
 
+        //grab all the contents of each destination
+        double[] listOfDestLong = new double[destinations.size()];
+        double[] listOfDestLat = new double[destinations.size()];
+        ArrayList<String> listOfDestNames = new ArrayList<String>();
+        ArrayList<String> listOfDestAddr = new ArrayList<String>();
+        for(int i=0; i<destinations.size(); i++){
+            listOfDestNames.add(i,destinations.get(i).name);
+            listOfDestLong[i] = destinations.get(i).longitude;
+            listOfDestLat[i] = destinations.get(i).latitude;
+            listOfDestAddr.add(destinations.get(i).address);
+        }
+
+        //Store the contents of each destination in the saved bundled
+        outState.putStringArrayList("dName", listOfDestNames);
+        outState.putDoubleArray("dLong", listOfDestLong);
+        outState.putDoubleArray("dLat", listOfDestLat);
+        outState.putStringArrayList("dAddr", listOfDestAddr);
+        super.onSaveInstanceState(outState);
     }
+
+    //restore the state of the app by recreating the destinations arraylist
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ArrayList<String> tempDestNames = savedInstanceState.getStringArrayList("dName");
+        double[] tempDestLongs = savedInstanceState.getDoubleArray("dLong");
+        double[] tempDestLats = savedInstanceState.getDoubleArray("dLat");
+        ArrayList<String> tempDestAddr = savedInstanceState.getStringArrayList("dAddr");
+
+        destinations.clear();
+        for(int i=0; i<tempDestNames.size(); i++){
+            Destination tempDest = new Destination(tempDestNames.get(i),tempDestLongs[i],tempDestLats[i]);
+            tempDest.address = tempDestAddr.get(i);
+            destinations.add(tempDest);
+        }
+        buildTable();
+    }
+
+
 
     /*
     This is called when a start icon is clicked
@@ -643,6 +681,12 @@ public class MainScreen extends Activity implements LocationListener {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.activity_main_screen);
     }
 
     //******These Methods are required for location manager******

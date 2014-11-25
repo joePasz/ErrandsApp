@@ -2,6 +2,7 @@ package errandsapp.errandsapp;
 
 /**
  * Created by Joe on 10/8/2014.
+ * class is very self explanatory
  */
 public class Destination {
     //public for testing purposes

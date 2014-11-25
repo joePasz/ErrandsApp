@@ -109,4 +109,45 @@ public class Recent extends Activity {
             finish();
         }
     }
+
+    //Save the state of the current destinations table
+    protected	void	onSaveInstanceState	(Bundle	outState){
+        Log.e(TAG, "++ SAVING!!! ++");
+
+        //grab all the contents of each destination
+        double[] listOfDestLong = new double[destinations.size()];
+        double[] listOfDestLat = new double[destinations.size()];
+        ArrayList<String> listOfDestNames = new ArrayList<String>();
+        ArrayList<String> listOfDestAddr = new ArrayList<String>();
+        for(int i=0; i<destinations.size(); i++){
+            listOfDestNames.add(i,destinations.get(i).name);
+            listOfDestLong[i] = destinations.get(i).longitude;
+            listOfDestLat[i] = destinations.get(i).latitude;
+            listOfDestAddr.add(destinations.get(i).address);
+        }
+
+        //Store the contents of each destination in the saved bundled
+        outState.putStringArrayList("dName", listOfDestNames);
+        outState.putDoubleArray("dLong", listOfDestLong);
+        outState.putDoubleArray("dLat", listOfDestLat);
+        outState.putStringArrayList("dAddr", listOfDestAddr);
+        super.onSaveInstanceState(outState);
+    }
+
+    //restore the state of the app by recreating the destinations arraylist
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ArrayList<String> tempDestNames = savedInstanceState.getStringArrayList("dName");
+        double[] tempDestLongs = savedInstanceState.getDoubleArray("dLong");
+        double[] tempDestLats = savedInstanceState.getDoubleArray("dLat");
+        ArrayList<String> tempDestAddr = savedInstanceState.getStringArrayList("dAddr");
+
+        destinations.clear();
+        for(int i=0; i<tempDestNames.size(); i++){
+            Destination tempDest = new Destination(tempDestNames.get(i),tempDestLongs[i],tempDestLats[i]);
+            tempDest.address = tempDestAddr.get(i);
+            destinations.add(tempDest);
+        }
+        buildTable();
+    }
 }
