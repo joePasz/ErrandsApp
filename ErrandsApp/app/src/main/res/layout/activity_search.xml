@@ -15,6 +15,7 @@
 
         <LinearLayout>
 
+            <!-- Search Bar -->
             <EditText
                 android:id="@+id/searchBar"
                 android:layout_width="250dp"
@@ -25,7 +26,7 @@
                 android:hint="Enter Search"
                 android:imeOptions="actionNext" />
 
-
+            <!-- Search Button -->
             <ImageButton
                 android:id="@+id/searchButton"
                 android:layout_width="wrap_content"
@@ -38,9 +39,8 @@
 
         </LinearLayout>
 
+        <!-- Layout for Search Results -->
         <LinearLayout>
-
-
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -49,9 +49,7 @@
                     android:id="@+id/table"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-
                 </TableLayout>
-
             </ScrollView>
         </LinearLayout>
 

@@ -24,35 +24,35 @@
                 android:layout_gravity="left"
                 android:orientation="vertical">
 
+                <!-- Destinations TextView-->
                 <TextView
                     android:id="@+id/desti"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="5dp"
-                    android:text="@string/destination_header"
-
+                    android:text="@string/destinations_header"
                     android:textStyle="bold" />
-
+                <!-- Address TextView -->
                 <TextView
                     android:id="@+id/address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/desti"
                     android:padding="5dp"
-                    android:text="Address"
+                    android:text="@string/address_entry"
                     android:textStyle="normal" />
 
 
             </LinearLayout>
 
-            <!--Layout for the Two Buttons -->
+            <!--Layout for the Start and Finish Buttons -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 >
 
-
+                <!-- Start Button -->
                 <ImageButton
                     android:id="@+id/start_button"
                     android:layout_width="wrap_content"
@@ -65,6 +65,7 @@
                     android:padding="3dp"
                     android:src="@drawable/start_icon" />
 
+                <!-- Finish Button-->
                 <ImageButton
                     android:id="@+id/end_Button"
                     android:layout_width="wrap_content"
@@ -77,8 +78,8 @@
                     android:padding="3dp"
                     android:src="@drawable/end_icon" />
 
-
             </LinearLayout>
+
         </LinearLayout>
 
         <View

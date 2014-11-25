@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Layout for 3 Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -18,6 +19,7 @@
             android:layout_weight="5"
             android:orientation="horizontal">
 
+            <!-- Cancel/Go Back Button -->
             <ImageButton
                 android:id="@+id/cancel"
                 android:layout_width="wrap_content"
@@ -30,6 +32,7 @@
                 android:padding="3dp"
                 android:src="@drawable/ic_action_cancel" />
 
+            <!-- Favorite Button -->
             <ImageButton
                 android:id="@+id/favorite"
                 android:layout_width="wrap_content"
@@ -41,7 +44,7 @@
                 android:onClick="favoriteClick"
                 android:padding="5dp"
                 android:src="@drawable/ic_action_favorite" />
-
+            <!-- Delete Button -->
             <ImageButton
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"

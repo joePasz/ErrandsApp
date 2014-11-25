@@ -23,21 +23,23 @@
                 android:layout_weight="3"
                 android:layout_width="270dp"
                 android:layout_height="wrap_content">
+
+                <!-- Destination -->
                 <TextView
                     android:id="@+id/desti"
                     android:textStyle="bold"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:padding="5dp"
-                    android:text="@string/destination_header"
+                    android:text="@string/destinations_header"
                     />
-
+                <!-- Address of Destination -->
                 <TextView
                     android:id="@+id/address"
                     android:textStyle="normal"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Address"
+                    android:text="@string/address_entry"
                     android:layout_below="@id/desti"
                     android:padding="5dp"
                     />
@@ -45,28 +47,26 @@
 
             </LinearLayout>
 
-            <!--Layout for the Two Buttons -->
+            <!--Layout for Delete -->
             <LinearLayout
                 android:layout_height="match_parent"
                 android:layout_width="wrap_content"
                 android:layout_weight="1">
 
-
+                <!-- Delete Button -->
                 <ImageButton android:id="@+id/delete_Button"
                     android:src="@drawable/ic_action_discard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="8dp"
                     android:layout_gravity="center"
                     android:background="@null"
                     android:padding="3dp"
                     android:layout_margin="5dp"
                     android:onClick="deleteClicked"
                     />
-
-
             </LinearLayout>
+
         </LinearLayout>
 
         <View

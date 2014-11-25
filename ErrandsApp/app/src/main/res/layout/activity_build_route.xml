@@ -12,29 +12,33 @@
         android:id="@+id/tablebuttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <LinearLayout>
-
             <Button
                 android:id="@+id/buildMapButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Build Map" />
+                android:text="@string/build_map_button"
+                android:paddingBottom="10dp" />
 
         </LinearLayout>
 
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Optimized Route:"
-            android:paddingTop="5dp"
+            android:text="@string/optimized_route"
+            android:paddingTop="10dp"
             android:textStyle="bold"
             android:textSize="18dp"/>
 
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/layout"
+            android:background="@android:color/darker_gray" />
 
+        <!-- Layout where build route will go -->
         <LinearLayout>
-
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -43,12 +47,9 @@
                     android:id="@+id/table"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-
-
                 </TableLayout>
             </ScrollView>
         </LinearLayout>
-
     </TableLayout>
 
 
