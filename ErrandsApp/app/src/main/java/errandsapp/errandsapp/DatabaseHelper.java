@@ -13,6 +13,7 @@ import java.util.ArrayList;
  * Created by Joe on 11/13/2014.
  */
 public class DatabaseHelper {
+    //Global Variables for the database
     public	static	final	String	DATABASE_NAME	=	"Routes.db";
     public 	static	final	int	DATABASE_VERSION	=	1;
     public	static	final	String	RL_TABLE_NAME	=	"RecentLocations" ;
@@ -35,6 +36,9 @@ public class DatabaseHelper {
         this.fav_InsertStmt	=	this.db.compileStatement(FAV_INSERT);
     }
 
+    /*
+    This method takes the parameters of a destination and inserts them into the recents db table
+     */
     public	long rlInsert(String	name, double longitude, double latitude, String address)	{
         this.rl_InsertStmt.bindString(1,	name);
         this.rl_InsertStmt.bindDouble(2, longitude);
@@ -43,6 +47,9 @@ public class DatabaseHelper {
         return	this.rl_InsertStmt.executeInsert();
     }
 
+    /*
+    This method takes the parameters of a destination and inserts them into the favorites db table
+     */
     public	long favInsert(String	name, double longitude, double latitude, String address)	{
         this.fav_InsertStmt.bindString(1,	name);
         this.fav_InsertStmt.bindDouble(2, longitude);
@@ -50,6 +57,10 @@ public class DatabaseHelper {
         this.fav_InsertStmt.bindString(4,	address);
         return	this.fav_InsertStmt.executeInsert();
     }
+
+    /*
+    These methods delete the contents of each of their respected tables
+     */
     public	void	rlDeleteAll()	{
         this.db.delete(RL_TABLE_NAME,	null,	null);
     }
@@ -57,6 +68,9 @@ public class DatabaseHelper {
         this.db.delete(FAV_TABLE_NAME,	null,	null);
     }
 
+    /*
+    This methods returns all the  recent destinations from the database as an arraylist of destinations
+     */
     public	ArrayList<Destination>	rlSelectAll()	{
         ArrayList<Destination> list	=	new ArrayList<Destination>();
         Cursor cursor	=
@@ -79,6 +93,9 @@ public class DatabaseHelper {
         return	list;
     }
 
+    /*
+    This methods returns all the favorite destinations from the database as an arraylist of destinations
+     */
     public	ArrayList<Destination>	favSelectAll()	{
         ArrayList<Destination> list	=	new ArrayList<Destination>();
         Cursor cursor	=
@@ -101,7 +118,9 @@ public class DatabaseHelper {
         return	list;
     }
 
-
+    /*
+    Helper class that is used to create and upgrade the tables of the database
+     */
     private static class	DatabaseOpenHelper	extends SQLiteOpenHelper {
         public static final int DATABASE_VERSION = 1;
         public static final String DATABASE_NAME = "Routes.db";

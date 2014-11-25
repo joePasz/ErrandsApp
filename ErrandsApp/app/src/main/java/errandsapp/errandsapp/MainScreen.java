@@ -373,13 +373,12 @@ public class MainScreen extends Activity implements LocationListener {
                     double newLat = data.getDoubleExtra("dLat",0.0);
                     Destination dest = new Destination(newText,newLong,newLat);
                     dest.address = data.getStringExtra("dAddress");
-                    //ensures it is not repeated, and then adds it to the recent database
+                    //ensures it is not repeated first, and then also adds it to the recent database
                     if(!checkRepeatedDestination(dest)){
                         destinations.add(dest);
                     }
-                    if(!checkRepeatedRecentDestination(dest)) {
-                        addRecentDestination(dest);
-                    }
+                    addRecentDestination(dest);
+
                     //rebuild table
                     buildTable();
                 }
@@ -640,17 +639,6 @@ public class MainScreen extends Activity implements LocationListener {
     public boolean checkRepeatedDestination(Destination tempDest) {
         for(int i = 0; i < destinations.size(); i++) {
             if (tempDest.equals(destinations.get(i))){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //just checks if the recentdestinations arraylist contains the parameter dest
-    // the .contains method was not working despite correctly overriding .equals, so this is the ugly solution
-    public boolean checkRepeatedRecentDestination(Destination tempDest) {
-        for(int i = 0; i < recentDestinations.size(); i++) {
-            if (tempDest.equals(recentDestinations.get(i))){
                 return true;
             }
         }

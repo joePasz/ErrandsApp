@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 
 public class Recent extends Activity {
-
     private TableLayout table;
     LayoutInflater inflater;
     private ArrayList<Destination> destinations;
@@ -30,15 +29,15 @@ public class Recent extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recent);
 
+        //intialize global variables and select all recent destinations from the db and store them in destinations
         dbHelper = new DatabaseHelper(getApplicationContext());
-        ArrayList<Destination> tempDests = dbHelper.rlSelectAll();
-        destinations = tempDests;
-
+        destinations = dbHelper.rlSelectAll();
         inflater = (LayoutInflater)this.getSystemService
                 (Context.LAYOUT_INFLATER_SERVICE);
-
         table = (TableLayout)findViewById(R.id.table);
         table.bringToFront();
+
+        //build table to reflect the recent locations
         buildTable();
     }
 
@@ -56,6 +55,7 @@ public class Recent extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        //Fix the up button
         if(id == android.R.id.home) {
             Recent.this.finish();
             return true;
@@ -63,22 +63,20 @@ public class Recent extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+    Method in charge of building the table based on the contents of the destinations arraylist
+     */
     public boolean buildTable() {
+        //first clears the table of previous entries
         int count = table.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = table.getChildAt(i);
             if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
         }
 
-        //builds a header row, ugly, but proof of concept
-//        TableRow header = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
-//        ((TextView)header.findViewById(R.id.column_1)).setText("Destination Name");
-//        header.setTag(-1);
-//        table.addView(header);
         //Dynamically adds rows based on the size of the destinations array
         for(int i = 0; i < destinations.size(); i++){
-            // Inflates the table_row_attributes.xml file
-            // not sure what inflates does, but I think I am doing this right....
+            // Inflates the search_results_table_row_attributes.xml file
             TableRow row = (TableRow) inflater.inflate(R.layout.search_results_table_row_attributes, null);
             //adds contents of the destination to the row
             ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(i).name);
@@ -89,6 +87,12 @@ public class Recent extends Activity {
         return true;
     }
 
+    /*
+    Method that is called when a cell is clicked
+    It finds which cell was selected by using the tag established in buildtable
+    this tag links the row with the destinations index
+    It then builds an intent to return to the mainscreen with the contents of the selected destination
+     */
     public void clickHandlerCell(View v){
         int cellNumber = (Integer)v.getTag();
         if (cellNumber != -1) {
@@ -105,16 +109,4 @@ public class Recent extends Activity {
             finish();
         }
     }
-
-    protected	void	onSaveInstanceState	(Bundle	outState){
-        super.onSaveInstanceState(outState);
-
-    }
-    protected	void	onRestoreInstanceState	(Bundle	savedInstanceState)	{
-        super.onRestoreInstanceState(savedInstanceState);
-
-    }
-
-
-
 }
