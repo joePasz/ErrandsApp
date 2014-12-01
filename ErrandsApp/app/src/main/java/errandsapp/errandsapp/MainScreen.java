@@ -30,6 +30,10 @@ import java.util.ArrayList;
 
 public class MainScreen extends Activity implements LocationListener {
 
+    //this is a boolean used to toggle debug mode on or off
+    //when false, debug mode is off and this runs as intended
+    private boolean debug;
+
     //Current Destinations, all recent destinations, and all favorite destinatinos
     private ArrayList<Destination> destinations;
     private ArrayList<Destination> recentDestinations;
@@ -54,6 +58,9 @@ public class MainScreen extends Activity implements LocationListener {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "++ In onCreate() ++");
         setContentView(R.layout.activity_main_screen);
+
+        //change this when you would like to enter or leave debug mode.
+        debug = true;
 
         //initilize global variables
         recentDestinations = new ArrayList<Destination>();
@@ -137,7 +144,7 @@ public class MainScreen extends Activity implements LocationListener {
                         ll.getLayoutParams().width = 1700;
                         ll.requestLayout();
                     }
-
+                    ((ImageButton)longClickView.findViewById(R.id.cancel)).setTag(tag);
                     ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
                     ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
                     deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
@@ -370,7 +377,77 @@ public class MainScreen extends Activity implements LocationListener {
 
     //Lazy way to rebuild the table if cancel is clicked on a highlighted destination.
     public void cancelClick(View v){
-        buildTable();
+        if(debug){
+            buildTable();
+        } else {
+            //When not in debug, this runs in the more efficent way.
+            //Instead of just rebuilding the table, this just builds the individual row.
+            //This was discovered with the profiler! and is used for checkpoint 5.
+
+            LinearLayout ll1 = (LinearLayout)v.getParent();
+            LinearLayout ll2 = (LinearLayout)ll1.getParent();
+            TableRow tempRow = (TableRow)ll2.getParent();
+
+            int rowIndex = (Integer)v.getTag();
+
+            TableRow row = (TableRow) inflater.inflate(R.layout.table_row_attributes, null);
+
+            //Finds oritentation and alters the row width if in landscape
+            if(getResources().getConfiguration().orientation == 2) {
+                LinearLayout ll = ((LinearLayout)row.findViewById(R.id.text_layout));
+                ll.getLayoutParams().width = 1350;
+                ll.requestLayout();
+            }
+            //Sets the tags for each button(start and end) and their default colors
+            ((TextView)row.findViewById(R.id.desti)).setText(destinations.get(rowIndex).name);
+            ((TextView)row.findViewById(R.id.address)).setText(destinations.get(rowIndex).address);
+            ImageButton startButton = (ImageButton)row.findViewById(R.id.start_button);
+            startButton.setTag(rowIndex);
+            startButton.setColorFilter(Color.argb(255, 150,200,150));
+            ImageButton endButton = (ImageButton)row.findViewById(R.id.end_Button);
+            endButton.setTag(rowIndex);
+            endButton.setColorFilter(Color.argb(255, 200,150,150));
+            row.setTag(rowIndex);
+
+            //sets the longClickListener for each row
+            row.setOnLongClickListener(new View.OnLongClickListener() {
+                public boolean onLongClick(View arg0) {
+                    TableRow longClickView = (TableRow) inflater.inflate(R.layout.long_click_layout, null);
+                    int height =  arg0.getHeight();
+                    int tag = (Integer)arg0.getTag();
+                    ViewGroup tempTable = (ViewGroup)arg0.getParent();
+                    int index = tempTable.indexOfChild(arg0);
+
+                    //Finds oritentation and alters the row width if in landscape
+                    if(getResources().getConfiguration().orientation == 2) {
+                        LinearLayout ll = ((LinearLayout)longClickView.findViewById(R.id.long_click));
+                        ll.getLayoutParams().width = 1700;
+                        ll.requestLayout();
+                    }
+                    ((ImageButton)longClickView.findViewById(R.id.cancel)).setTag(tag);
+                    ((ImageButton)longClickView.findViewById(R.id.delete)).setTag(tag);
+                    ImageButton deleteButton = (ImageButton)longClickView.findViewById(R.id.delete);
+                    deleteButton.setColorFilter(Color.argb(255, 255,0,0)); // White Tint
+                    ImageButton favButton = ((ImageButton)longClickView.findViewById(R.id.favorite));
+                    favButton.setTag(tag);
+                    int favLoc = locationOfFavorite(destinations.get(tag));
+                    if(favLoc == -1) {
+                        favButton.setColorFilter(Color.argb(0, 255,255,255));
+                    } else {
+                        favButton.setColorFilter(Color.argb(255, 255,255,0));
+                    }
+                    longClickView.setMinimumHeight(height);
+                    tempTable.removeView(arg0);
+                    tempTable.addView(longClickView, index);
+
+                    return true;
+                }
+            });
+
+            int tableIndex = table.indexOfChild(tempRow);
+            table.removeView(tempRow);
+            table.addView(row, tableIndex);
+        }
     }
 
 
