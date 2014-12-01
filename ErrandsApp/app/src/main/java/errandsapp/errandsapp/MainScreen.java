@@ -194,6 +194,7 @@ public class MainScreen extends Activity implements LocationListener {
                 //checks that there is a current location found
                 if(currentLocation != null) {
                     Destination dest = new Destination("Current Location",currentLocation.getLongitude(),currentLocation.getLatitude());
+                    dest.address = " ";
                     if(!checkRepeatedDestination(dest)) {
                         destinations.add(dest);
                         //rebuild table
@@ -283,6 +284,11 @@ public class MainScreen extends Activity implements LocationListener {
     }
     protected void onPause() {
         super.onPause();
+        dbHelper.favDeleteAll();
+        for(int i = 0; i < favoriteDestinations.size(); i++) {
+            Destination fDest = favoriteDestinations.get(i);
+            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+        }
         Log.e(TAG, "++ In onPause() ++");
 
     }
@@ -352,10 +358,10 @@ public class MainScreen extends Activity implements LocationListener {
             Destination tempFavDest = destinations.get(cellNumber);
             int favLoc = locationOfFavorite(tempFavDest);
             ImageButton imageView = (ImageButton)v;
-            if(favLoc == -1){
+            if(favLoc == -1 && !tempFavDest.name.equals("Current Location")){
                 addFavoriteDestination(tempFavDest);
                 imageView.setColorFilter(Color.argb(255, 255,255,0)); // White Tint
-            } else {
+            } else if(!tempFavDest.name.equals("Current Location")){
                 removeFavoriteDestination(tempFavDest, favLoc);
                 imageView.setColorFilter(Color.argb(0, 255,255,255)); // White Tint
             }
@@ -436,13 +442,9 @@ public class MainScreen extends Activity implements LocationListener {
         if(locationManager != null && isGPSEnabled) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if(currentLocation != null) {
-            }
         } else if(locationManager != null && isWifiEnabled) {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if(currentLocation != null) {
-            }
         }
     }
 
@@ -527,11 +529,11 @@ public class MainScreen extends Activity implements LocationListener {
      */
     public void addFavoriteDestination(Destination destination) {
         favoriteDestinations.add(0, destination);
-        dbHelper.favDeleteAll();
-        for(int i = 0; i < favoriteDestinations.size(); i++) {
-            Destination fDest = favoriteDestinations.get(i);
-            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
-        }
+//        dbHelper.favDeleteAll();
+//        for(int i = 0; i < favoriteDestinations.size(); i++) {
+//            Destination fDest = favoriteDestinations.get(i);
+//            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+//        }
     }
 
     /*
@@ -540,11 +542,11 @@ public class MainScreen extends Activity implements LocationListener {
      */
     public void removeFavoriteDestination(Destination destination, int location) {
         favoriteDestinations.remove(location);
-        dbHelper.favDeleteAll();
-        for(int i = 0; i < favoriteDestinations.size(); i++) {
-            Destination fDest = favoriteDestinations.get(i);
-            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
-        }
+//        dbHelper.favDeleteAll();
+//        for(int i = 0; i < favoriteDestinations.size(); i++) {
+//            Destination fDest = favoriteDestinations.get(i);
+//            dbHelper.favInsert(fDest.name, fDest.longitude, fDest.latitude, fDest.address);
+//        }
     }
 
     /*
@@ -702,7 +704,7 @@ public class MainScreen extends Activity implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         //Removes updates once a locaiton is found, beeter on battery life
-        locationManager.removeUpdates(this);
+//        locationManager.removeUpdates(this);
     }
 
     @Override
