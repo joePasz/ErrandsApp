@@ -16,7 +16,6 @@ import errandsapp.errandsapp.MainScreen;
 public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen> {
 
     private Solo solo;
-    private ImageButton img;
 
     public MainScreenTest(){
 
@@ -36,10 +35,8 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
         super.tearDown();
     }
 
-   public void testActivityActive() throws Exception {
+   public void testActivityActive() {
        solo.assertCurrentActivity("Wrong Activity", MainScreen.class);
-       solo.clickOnImageButton(0);
-       solo.assertCurrentActivity("Wrong Activity", Search.class);
    }
 
     /** Testing to see if each button the screen is present

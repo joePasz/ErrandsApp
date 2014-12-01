@@ -35,7 +35,8 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@+id/searchBar"
-                android:src="@drawable/ic_action_search" />
+                android:src="@drawable/ic_action_search"
+                android:text="@string/search_button"/>
 
         </LinearLayout>
 
