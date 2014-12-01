@@ -38,8 +38,8 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
 
    public void testActivityActive() throws Exception {
        solo.assertCurrentActivity("Wrong Activity", MainScreen.class);
-       solo.clickOnButton(solo.getString(R.string.build_route_button));
-      // solo.assertCurrentActivity("Wrong Activity",BuildRoute.class);
+       solo.clickOnImageButton(0);
+       solo.assertCurrentActivity("Wrong Activity", Search.class);
    }
 
     /** Testing to see if each button the screen is present
