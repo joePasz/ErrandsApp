@@ -48,4 +48,12 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
         solo.searchButton(solo.getString(R.string.GPSLoc),true);
     }
 
+    /**
+     * Testing to see if the headers are both present on the Main Screen
+     */
+    public void testTextPresent(){
+        solo.searchText(solo.getString(R.string.destinations_header));
+        solo.searchText(solo.getString(R.string.start_end_header));
+    }
+
 }

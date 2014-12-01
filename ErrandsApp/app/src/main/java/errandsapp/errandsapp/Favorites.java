@@ -33,7 +33,7 @@ public class Favorites extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
-        //intialize global variables and select all favorite destinations from the db and store them in destinations
+        // Initialize global variables and select all favorite destinations from the db and store them in destinations
         dbHelper = new DatabaseHelper(getApplicationContext());
         destinations = dbHelper.favSelectAll();
         inflater = (LayoutInflater)this.getSystemService
