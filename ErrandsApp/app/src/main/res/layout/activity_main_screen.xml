@@ -36,7 +36,8 @@
                 android:id="@+id/searchButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_search" />
+                android:src="@drawable/ic_action_search"
+                android:text="@string/search_button"/>
 
             <!-- GPS Location Button -->
             <ImageButton
@@ -44,7 +45,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_action_place"
-                android:layout_gravity="right" />
+                android:layout_gravity="right"
+                android:text="@string/GPSLoc"/>
 
         </LinearLayout>
 

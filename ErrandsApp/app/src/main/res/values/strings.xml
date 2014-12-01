@@ -10,6 +10,8 @@
     <string name="delete_button">Delete</string>
     <string name="title_activity_recent">Recent</string>
     <string name="title_activity_favorites">Favorites</string>
+    <string name="search_button">Search</string>
+    <string name="GPSLoc">GPS Location</string>
 
 
     <string name="build_map_button">Build Map</string>
