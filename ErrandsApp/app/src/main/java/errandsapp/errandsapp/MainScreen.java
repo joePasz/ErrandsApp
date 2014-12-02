@@ -71,7 +71,8 @@ public class MainScreen extends Activity implements LocationListener {
                 (Context.LAYOUT_INFLATER_SERVICE);
 
         //builds test data
-        buildTestData();
+        //Uncomment if you want to auto generate 5 locations
+        //buildTestData();
 
         //Sets location abilities up
         establishLocation();

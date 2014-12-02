@@ -4,6 +4,8 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.robotium.solo.Solo;
 
+import junit.framework.Assert;
+
 /**
  * Created by schuster110 on 12/1/14.
  */
@@ -33,5 +35,14 @@ public class SearchTest extends ActivityInstrumentationTestCase2<Search> {
 
     public void testButtonPresent(){
         solo.searchButton(solo.getString(R.id.searchButton), true);
+    }
+
+    public void testSearch() throws Exception {
+        // open the menu
+        solo.clickOnEditText(0);
+        solo.clearEditText(0);
+        Assert.assertTrue(solo.searchText(""));
+        solo.enterText(0, "Wendy's");
+        Assert.assertTrue(solo.searchText("Wendy's"));
     }
 }

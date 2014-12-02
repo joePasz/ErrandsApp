@@ -1,14 +1,8 @@
 package errandsapp.errandsapp;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
-import android.widget.ImageButton;
 
-import junit.framework.Assert;
 import com.robotium.solo.Solo;
-
-import errandsapp.errandsapp.BuildRoute;
-import errandsapp.errandsapp.MainScreen;
 
 /**
  * Created by schuster110 on 11/30/14.
@@ -39,6 +33,8 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
        solo.assertCurrentActivity("Wrong Activity", MainScreen.class);
    }
 
+
+
     /** Testing to see if each button the screen is present
      *
      */
@@ -48,6 +44,12 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
         solo.searchButton(solo.getString(R.string.GPSLoc),true);
     }
 
+    public void testSearch() {
+        solo.assertCurrentActivity("Wrong Activity", MainScreen.class);
+        solo.clickOnImageButton(0);
+        solo.assertCurrentActivity("Wrong Activity", Search.class);
+    }
+
     /**
      * Testing to see if the headers are both present on the Main Screen
      */
@@ -55,5 +57,6 @@ public class MainScreenTest extends ActivityInstrumentationTestCase2<MainScreen>
         solo.searchText(solo.getString(R.string.destinations_header));
         solo.searchText(solo.getString(R.string.start_end_header));
     }
+
 
 }
